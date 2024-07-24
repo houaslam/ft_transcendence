@@ -1,0 +1,31 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="shortcut icon" href="">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <title>Game</title>
+    {% comment %} <link rel="stylesheet" href="{% static '/css/style.css' %}"> {% endcomment %}
+
+</head>
+<body>
+    <main id="canva">
+        <script type="text/javascript">
+            let url = "ws://${window.location.host}/ws/socket-server/"
+            const chatSocket = new WebSocket(url)
+            chatSocket.onmessage = function(e){
+                let data = JSON.parse(e.data)
+                console.log("Data :", data)
+            }
+        </script>
+
+        <h1>{{ball.position}} </h1>
+
+        {% comment %} <script src="{% static '/js/script.js'%}" type="module"></script>
+        <script src="{% static '/js/Ball.js'%}" type="module"></script>
+        <script src="{% static '/js/elemets.js'%}" type="module"></script> {% endcomment %}
+    </main>
+</body>
+</html>
