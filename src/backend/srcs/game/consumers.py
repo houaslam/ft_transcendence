@@ -2,11 +2,13 @@ import json
 from channels.generic.websocket import WebsocketConsumer
 
 class GameConsumer(WebsocketConsumer):
+
 	def connect(self):
-		self.connect()
+		self.accept()
+
 		self.send(text_data=json.dumps(
-    	{
-			"message" : "HELLO "
+		{
+			"message" : "HELLO ",
 			'USER': "root"
 		})
 	)

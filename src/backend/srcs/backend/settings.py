@@ -22,13 +22,14 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     # 'game.apps.gameConfig',
-    'channels',
+    'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'channels',
     'game'
 ]
 
