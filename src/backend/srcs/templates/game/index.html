@@ -36,7 +36,7 @@
 			// SCENE
 			const scene = new THREE.Scene(  );
 			
-			let ball, player, otherplayer, plane;
+			let ball, player, otherPlayer, plane;
 			
 			//PLANE
 			plane = new THREE.Mesh(new THREE.BoxGeometry( 3, .2, 5 ), new THREE.MeshLambertMaterial( { color:0x005599 } ))
@@ -49,7 +49,7 @@
 			
 			
 			//OTHERPLAYER
-			otherplayer =  new THREE.Mesh(new THREE.BoxGeometry( 1, .3, .3 ), new THREE.MeshLambertMaterial( { color:0x005500 } ))
+			otherPlayer =  new THREE.Mesh(new THREE.BoxGeometry( 1, .3, .3 ), new THREE.MeshLambertMaterial( { color:0x005500 } ))
 
 			// ORBIT CONTROLER
 			const orbit = new OrbitControls( camera, renderer.domElement )
@@ -69,7 +69,7 @@
 			scene.add(  axesHelper  );
 			scene.add(  plane );
 			scene.add(  player );
-			scene.add(  otherplayer );
+			scene.add(  otherPlayer );
 			scene.add(  ball );
 			
 			
@@ -79,11 +79,12 @@
 				renderer.render( scene, camera );
 				chatSocket.onmessage = function(e){
 					let data = JSON.parse(e.data)
-					console.log("SOCKET = ", data['ball'])
-					{% comment %} ball.position.set(data['ball'][0], data['ball'][1], data['ball'][2]) {% endcomment %}
-					console.log("THREE = ", ball.position)
-					{% comment %} player.position.set(data['player']) {% endcomment %}
-					{% comment %} otherplayer.position.set(data['otherplayer']) {% endcomment %}
+
+					ball.position.set(data['ball']['position'][0], data['ball']['position'][1],data['ball']['position'][2])
+					
+					{% comment %} player.position.set(data['player']['position'][0], data['player']['position'][1],data['player']['position'][2])
+					otherPlayer.position.set(data['otherPlayer']['position'][0], data['otherPlayer']['position'][1],data['otherPlayer']['position'][2]) {% endcomment %}
+			
 				}
 			 }
 		</script>

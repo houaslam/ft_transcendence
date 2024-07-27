@@ -1,4 +1,4 @@
-import json
+import json, time
 from channels.generic.websocket import WebsocketConsumer
 
 
@@ -64,11 +64,12 @@ class Ball():
 
 	# def update(self):
 	def update(self, plane, player, otherplayer):
+    # X:0 Y:1 Z:2
 		self.velocity[1] += 0.03;
-		self.velocity[0] += 0.03;	
 		
 		if (self.bottom <= plane.top):
 			self.velocity[1] = 0;
+
 		if (self.left <= plane.left or self.right >= plane.right):
 			self.velocity[0] *= -1;
 		
@@ -77,8 +78,8 @@ class Ball():
 			if ((self.left >= player.left - self.dimension[0] and self.right <= player.right + self.dimension[0]) or
 				( player.left > self.position[0]  and player.left < self.right) or 
 				( player.right < self.position[0]  and player.right > self.left)):
-					# hitpont = (self.position[0] - player.position[0]) / player.dimension[0]
-					# self.velocity[0] = hitpont * 0.05
+					hitpont = (self.position[0] - player.position[0]) / player.dimension[0]
+					self.velocity[0] = hitpont * 0.05
 					# print("player x " , self.position[0])
 					# print("ball x " , player.position[0])
 					# print("HITPOINT " , hitpont)
@@ -94,33 +95,29 @@ class Ball():
 		# 	else:
 		# 		self.reset();
 
-		self.position[1] -= self.velocity[1];
 		self.position[0] += self.velocity[0];
+		self.position[1] -= self.velocity[1];
 		self.position[2] += self.velocity[2];
-
 		self.updateBounds()
+
 
 def animation(sender):
 	# 			position,   velocity,    dimension, mOde (player)
 	#			 x  y  z	x   y   z	  x  y  z	
-	ball = Ball([0,.8,0], [.01,.01,.05], [.2,32,15]);
+	ball = Ball( [ 0 , .8 , 0 ], [ .01,.01,.05 ], [ .2,32,15 ] );
 	plane = Box([0,0,0], [.01,.01,.05], [3,.2,5], '')
-	player = Box([0,.4,.2], [0,-.1,.05], [1,.3,.3], '');
-	otherPlayer = Box([0,.4,.2], [0,-.1,.05], [1,.3,.3], 'AI')
+	player = Box([0,.4,plane.dimension[2]/2 - .3], [0,-.1,.05], [1,.3,.3], '');
+	otherPlayer = Box([0,.4,-plane.dimension[2]/2 + .3], [0,-.1,.05], [1,.3,.3], 'AI')
 	while True:
 		ball.update(plane, player, otherPlayer)
-		allCoordinate = {
-			"ball" :{
-				"position": ball.position
-			},
-			"player":{
-				"position":player.position
-			},
-			"otherPlayer":otherPlayer.position
-		}
+		player.update(plane, ball)
+		otherPlayer.update(plane, ball)
+		allCoordinate = {"ball" :{"position": ball.position},
+			# "player":{"position":player.position},
+			# "otherPlayer":{"position": otherPlayer.position}
+   }
 		sender.send(text_data=json.dumps(allCoordinate))
-		# return allCoordinate
-		# render(request, 'index.html', context=allCoordinate);
+	
 
 # animation()
 
@@ -129,9 +126,9 @@ class GameConsumer(WebsocketConsumer):
 	def connect(self):
 		self.accept()
 		animation(self);
-		# self.send(text_data=json.dumps(
-		# {
-		# 	"message" : "HELLO ",
-		# 	'USER': "root"
-		# })
+	# 	self.send(text_data=json.dumps(
+	# 	{
+	# 		"message" : "HELLO ",
+	# 		'USER': "root"
+	# 	})
 	# )
