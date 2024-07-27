@@ -2,31 +2,91 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <link rel="shortcut icon" href="">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="/favicon.ico" type="image/x-icon">
-    <title>Game</title>
-    {% comment %} <link rel="stylesheet" href="{% static '/css/style.css' %}"> {% endcomment %}
+	<meta charset="UTF-8">
+	<link rel="shortcut icon" href="">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="icon" href="/favicon.ico" type="image/x-icon">
+	<title>Game</title>
 
 </head>
 <body>
-    <main id="canva">
-        <script type="text/javascript">
-            
-            let url = `ws://${window.location.host}/ws/socket-server/`
-            const chatSocket = new WebSocket(url)
-            chatSocket.onmessage = function(e){
-                let data = JSON.parse(e.data)
-                console.log("Data :", data)
-            }
-        </script>
+	<main id="canva">
+		<script  type='module'>
 
-        <h1>{{ball.position}} </h1>
+			import * as THREE from 'https://cdnjs.cloudflare.com/ajax/libs/three.js/0.167.0/three.module.js'
+			import { OrbitControls } from 'https://cdn.skypack.dev/three@0.129.0/examples/jsm/controls/OrbitControls.js';
 
-        {% comment %} <script src="{% static '/js/script.js'%}" type="module"></script>
-        <script src="{% static '/js/Ball.js'%}" type="module"></script>
-        <script src="{% static '/js/elemets.js'%}" type="module"></script> {% endcomment %}
-    </main>
+			let url = `ws://${window.location.host}/ws/socket-server/`
+			const chatSocket = new WebSocket(url)
+			
+
+
+			let camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
+			camera.position.z = 5;
+			camera.position.y = 1;
+			
+			// RENDER
+			const renderer = new THREE.WebGLRenderer(  );
+			renderer.setSize( window.innerWidth, window.innerHeight  );
+			renderer.shadowMap.enabled = true;
+			document.body.appendChild( renderer.domElement )
+			renderer.setAnimationLoop( animation );
+			
+			
+			// SCENE
+			const scene = new THREE.Scene(  );
+			
+			let ball, player, otherplayer, plane;
+			
+			//PLANE
+			plane = new THREE.Mesh(new THREE.BoxGeometry( 3, .2, 5 ), new THREE.MeshLambertMaterial( { color:0x005599 } ))
+			
+			// 	BALL
+			ball = new THREE.Mesh( new THREE.SphereGeometry( .2, 32, 15 ), new THREE.MeshLambertMaterial( { color:0xff14ff} ))
+			
+			// PLAYER
+			player = new THREE.Mesh(new THREE.BoxGeometry( 1, .3, .3 ), new THREE.MeshLambertMaterial( { color:0xffffff } ))
+			
+			
+			//OTHERPLAYER
+			otherplayer =  new THREE.Mesh(new THREE.BoxGeometry( 1, .3, .3 ), new THREE.MeshLambertMaterial( { color:0x005500 } ))
+
+			// ORBIT CONTROLER
+			const orbit = new OrbitControls( camera, renderer.domElement )
+
+			// HELPER
+			const axesHelper = new THREE.AxesHelper(  5  );
+			
+			// LIGHT
+			const light = new THREE.DirectionalLight(  0xffffff, 6  );
+			light.castShadow = true
+			light.position.y = 5;
+			light.position.z = 5;
+			
+			
+			// SCENE
+			scene.add(  light  );
+			scene.add(  axesHelper  );
+			scene.add(  plane );
+			scene.add(  player );
+			scene.add(  otherplayer );
+			scene.add(  ball );
+			
+			
+			// ANIMATION LOOP
+
+			function animation(  ){ 
+				renderer.render( scene, camera );
+				chatSocket.onmessage = function(e){
+					let data = JSON.parse(e.data)
+					console.log("SOCKET = ", data['ball'])
+					{% comment %} ball.position.set(data['ball'][0], data['ball'][1], data['ball'][2]) {% endcomment %}
+					console.log("THREE = ", ball.position)
+					{% comment %} player.position.set(data['player']) {% endcomment %}
+					{% comment %} otherplayer.position.set(data['otherplayer']) {% endcomment %}
+				}
+			 }
+		</script>
+	</main>
 </body>
 </html>
