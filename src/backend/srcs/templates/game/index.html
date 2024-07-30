@@ -16,10 +16,12 @@
 			import * as THREE from 'https://cdnjs.cloudflare.com/ajax/libs/three.js/0.167.0/three.module.js'
 			import { OrbitControls } from 'https://cdn.skypack.dev/three@0.129.0/examples/jsm/controls/OrbitControls.js';
 
-			let url = `ws://${window.location.host}/ws/socket-server/`
-			const chatSocket = new WebSocket(url)
+			let url = `ws://${window.location.host}/ws/game/`
+			const gameSocket = new WebSocket(url)
 			
-
+			gameSocket.onopen = function(){
+				console.log("Connection established!");
+			}
 
 			let camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
 			camera.position.z = 5;
@@ -76,16 +78,15 @@
 			// ANIMATION LOOP
 
 			function animation(  ){ 
-				renderer.render( scene, camera );
-				chatSocket.onmessage = function(e){
+				gameSocket.onmessage = function(e){
 					let data = JSON.parse(e.data)
-
-					ball.position.set(data['ball']['position'][0], data['ball']['position'][1],data['ball']['position'][2])
 					
-					{% comment %} player.position.set(data['player']['position'][0], data['player']['position'][1],data['player']['position'][2])
-					otherPlayer.position.set(data['otherPlayer']['position'][0], data['otherPlayer']['position'][1],data['otherPlayer']['position'][2]) {% endcomment %}
-			
+					ball.position.set(data['ball']['position'][0], data['ball']['position'][1],data['ball']['position'][2])
+					player.position.set(data['player']['position'][0], data['player']['position'][1],data['player']['position'][2])
+					otherPlayer.position.set(data['otherPlayer']['position'][0], data['otherPlayer']['position'][1],data['otherPlayer']['position'][2])
+					
 				}
+				renderer.render( scene, camera );
 			 }
 		</script>
 	</main>

@@ -65,6 +65,9 @@ class Ball():
 	# def update(self):
 	def update(self, plane, player, otherplayer):
     # X:0 Y:1 Z:2
+		self.updateBounds()
+		print("VELOCITY = ", self.velocity)
+		print("POSITION = ", self.position)
 		self.velocity[1] += 0.03;
 		
 		if (self.bottom <= plane.top):
@@ -78,44 +81,50 @@ class Ball():
 			if ((self.left >= player.left - self.dimension[0] and self.right <= player.right + self.dimension[0]) or
 				( player.left > self.position[0]  and player.left < self.right) or 
 				( player.right < self.position[0]  and player.right > self.left)):
-					hitpont = (self.position[0] - player.position[0]) / player.dimension[0]
-					self.velocity[0] = hitpont * 0.05
-					# print("player x " , self.position[0])
-					# print("ball x " , player.position[0])
-					# print("HITPOINT " , hitpont)
+
+					# hitpont = (self.position[0] - player.position[0]) / player.dimension[0]
+					# self.velocity[0] = hitpont * 0.05
+					time.sleep(1)
+					# print("PLAYER HISTPOINT = ", hitpont)
 					self.velocity[2] *= -1
+
 			else:
 				self.reset();
 
-		# if (self.front <= otherplayer.back  and self.velocity[2] < 0):
-		# 	if (self.left >= otherplayer.left - self.dimension[0] and self.right <= otherplayer.right + self.dimension[0]) :
-		# 		hitpont = (self.position[0] - otherplayer.position[0]) / player.dimension[0];
-		# 		self.velocity[0] = hitpont * 0.05
-		# 		self.velocity[2] *= -1;
-		# 	else:
-		# 		self.reset();
+		if (self.front <= otherplayer.back  and self.velocity[2] < 0):
+			if (self.left >= otherplayer.left - self.dimension[0] and self.right <= otherplayer.right + self.dimension[0]) :
+				# hitpont = (self.position[0] - otherplayer.position[0]) / player.dimension[0];
+				# self.velocity[0] = hitpont * 0.05
+				time.sleep(1)
+				# print("OTHER PLAYER HISTPOINT = ", hitpont)
+				self.velocity[2] *= -1;
+			else:
+				self.reset();
 
 		self.position[0] += self.velocity[0];
 		self.position[1] -= self.velocity[1];
 		self.position[2] += self.velocity[2];
-		self.updateBounds()
 
 
 def animation(sender):
-	# 			position,   velocity,    dimension, mOde (player)
-	#			 x  y  z	x   y   z	  x  y  z	
-	ball = Ball( [ 0 , .8 , 0 ], [ .01,.01,.05 ], [ .2,32,15 ] );
+	# 			position,  		 velocity,   		 dimension,         mOde (player)
+	#			   x    y   z	    x   y   z		 x  y  z	
+	ball = Ball( [ 0 , .8 , 0 ], [ .01,.01,.01 ], [ .2,32,15 ] );
 	plane = Box([0,0,0], [.01,.01,.05], [3,.2,5], '')
 	player = Box([0,.4,plane.dimension[2]/2 - .3], [0,-.1,.05], [1,.3,.3], '');
-	otherPlayer = Box([0,.4,-plane.dimension[2]/2 + .3], [0,-.1,.05], [1,.3,.3], 'AI')
+	otherPlayer = Box([0,.4,-plane.dimension[2]/2 + .3], [0,-.1,.05], [1,.3,.3], '')
+	print("START ")
+	time.sleep(2);
 	while True:
 		ball.update(plane, player, otherPlayer)
 		player.update(plane, ball)
 		otherPlayer.update(plane, ball)
-		allCoordinate = {"ball" :{"position": ball.position},
-			# "player":{"position":player.position},
-			# "otherPlayer":{"position": otherPlayer.position}
-   }
+		allCoordinate = {
+				"ball" :{"position": ball.position},
+				"player":{"position":player.position},
+				"otherPlayer":{"position": otherPlayer.position}
+	}
+			# time.sleep(0.5)
 		sender.send(text_data=json.dumps(allCoordinate))
 	
 
