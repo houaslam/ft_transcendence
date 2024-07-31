@@ -1,5 +1,6 @@
 import json, time
 from channels.generic.websocket import WebsocketConsumer
+from random import random
 
 
 class Box():
@@ -66,8 +67,6 @@ class Ball():
 	def update(self, plane, player, otherplayer):
     # X:0 Y:1 Z:2
 		self.updateBounds()
-		print("VELOCITY = ", self.velocity)
-		print("POSITION = ", self.position)
 		self.velocity[1] += 0.03;
 		
 		if (self.bottom <= plane.top):
@@ -84,8 +83,8 @@ class Ball():
 
 					# hitpont = (self.position[0] - player.position[0]) / player.dimension[0]
 					# self.velocity[0] = hitpont * 0.05
-					time.sleep(1)
 					# print("PLAYER HISTPOINT = ", hitpont)
+					self.velocity[0] = random()
 					self.velocity[2] *= -1
 
 			else:
@@ -94,8 +93,8 @@ class Ball():
 		if (self.front <= otherplayer.back  and self.velocity[2] < 0):
 			if (self.left >= otherplayer.left - self.dimension[0] and self.right <= otherplayer.right + self.dimension[0]) :
 				# hitpont = (self.position[0] - otherplayer.position[0]) / player.dimension[0];
+				self.velocity[0] = random()
 				# self.velocity[0] = hitpont * 0.05
-				time.sleep(1)
 				# print("OTHER PLAYER HISTPOINT = ", hitpont)
 				self.velocity[2] *= -1;
 			else:
@@ -113,8 +112,6 @@ def animation(sender):
 	plane = Box([0,0,0], [.01,.01,.05], [3,.2,5], '')
 	player = Box([0,.4,plane.dimension[2]/2 - .3], [0,-.1,.05], [1,.3,.3], '');
 	otherPlayer = Box([0,.4,-plane.dimension[2]/2 + .3], [0,-.1,.05], [1,.3,.3], '')
-	print("START ")
-	time.sleep(2);
 	while True:
 		ball.update(plane, player, otherPlayer)
 		player.update(plane, ball)
@@ -124,7 +121,7 @@ def animation(sender):
 				"player":{"position":player.position},
 				"otherPlayer":{"position": otherPlayer.position}
 	}
-			# time.sleep(0.5)
+		time.sleep(0.05)
 		sender.send(text_data=json.dumps(allCoordinate))
 	
 
@@ -135,9 +132,11 @@ class GameConsumer(WebsocketConsumer):
 	def connect(self):
 		self.accept()
 		animation(self);
-	# 	self.send(text_data=json.dumps(
-	# 	{
-	# 		"message" : "HELLO ",
-	# 		'USER': "root"
-	# 	})
-	# )
+ 
+	def receive(self, text_data):
+		data = json.loads(text_data)
+		print('DATA = ', data);
+	
+	def disconnect(self, close_code):
+		print("BYE BYE", close_code);
+		pass
