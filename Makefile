@@ -8,7 +8,7 @@ fclean : clean
 
 re : clean all
 
-push: clean
+push:
 	git add .
 	git commit -m "gamePart asgi"
 	git push
