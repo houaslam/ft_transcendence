@@ -3,10 +3,17 @@ from django.db import models
 # Create your models
 
 class Player(models.Model):
-    name = models.CharField(max_length=50)
-    
+	name = models.CharField(max_length=50)
+
+	def __str__(self):
+		return f"{self.name}"
+	
 class Game(models.Model):
-    name = models.CharField(max_length=50)
-    player = models.ForeignKey(Player, on_delete=models.CASCADE, related_name='game_player')
-    oponnent = models.ForeignKey(Player, on_delete=models.CASCADE, related_name='game_opponnent')
-    players_nb = models.IntegerField(default=0);
+	# p1 = Player("player")
+	name = models.CharField(max_length=50)
+	player = models.ForeignKey(Player, on_delete=models.CASCADE, null=True, related_name="player")
+	opponent = models.ForeignKey(Player, on_delete=models.CASCADE, null=True, related_name="opponent")
+	players_nb = models.IntegerField(default=0);
+ 
+	def __str__(self):
+		return f"{self.name}"
