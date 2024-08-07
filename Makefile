@@ -1,5 +1,5 @@
 all :
-	docker compose -f src/docker-compose.yml up --build -d
+	docker compose -f src/docker-compose.yml up --build -d  --remove-orphans
 clean :
 	docker compose -f src/docker-compose.yml down -v
 fclean : clean

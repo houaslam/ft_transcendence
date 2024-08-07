@@ -1,4 +1,3 @@
-{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,12 +10,12 @@
 </head>
 <body>
 	<main id="canva">
-		<form id="main">
-			<input name="message" type="text">
-		</form>
+
+		<h1 id='game'></h1>
 		<div id='messages'></div>
+
+
 		<script  type='module'>
-			let form = document.getElementById('main');
 			let url = `ws://${window.location.host}/ws/game/`
 			const gameSocket = new WebSocket(url)
 			
@@ -26,22 +25,11 @@
 			
 			gameSocket.onmessage = function(e){
 				let msg = JSON.parse(e.data)
-				if (msg['type'] == 'msg'){
-					let main = document.getElementById('messages');
-					main.innerHTML += `<div><p>${msg['data']}</p></div>`
-					console.log(`<div><p>${msg['data']}</p></div>`)
-
-				}
+				console.log(msg['data']);
 			}
-			form.addEventListener('submit', (e)=>{
-				e.preventDefault()
-				let message = e.target.message.value
-				gameSocket.send(JSON.stringify({
-					'data':message
-				}))
-				form.reset()
-			})
 		</script>
+
+
 	</main>
 </body>
 </html>
