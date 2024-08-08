@@ -13,7 +13,6 @@ class GameConsumer(AsyncWebsocketConsumer):
 
 		# # INTERNAL CONNECTION
 		await self.accept()
-		# self.group_name = "test"
 		await self.channel_layer.group_add("test",self.channel_name)
   
 
@@ -23,9 +22,9 @@ class GameConsumer(AsyncWebsocketConsumer):
 
 		# # GAME LAUNCH
 		if (len(players) >= 2):
-			task = asyncio.create_task(game.animation(self.channel_layer));
-			await task
-			print(task)
+			asyncio.create_task(game.animation(self.channel_layer));
+			# await task
+			# print(task)
 
 	async def receive(self, text_data):
 		dataJson = json.loads(text_data)

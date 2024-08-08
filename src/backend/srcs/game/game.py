@@ -103,11 +103,14 @@ class Ball():
 
 
 async def animation(channel_layer):
+	ball = Ball([0, 0.8, 0], [0, 0.01, 0.05], [2, 32, 15])
+	# plane = Box()
 	while True:
+		# ball.update()
 		allCoordinate = {
-			"ball": "succes"
+			"ball": ball.position
 		}
-		asyncio.sleep(0.05)
+		await asyncio.sleep(0.05)
 		await channel_layer.group_send("test",
 		{
 			'type': 'create_msg',
@@ -115,5 +118,3 @@ async def animation(channel_layer):
 		}
 		)
 	
-
-
