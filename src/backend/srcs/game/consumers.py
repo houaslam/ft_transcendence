@@ -17,25 +17,25 @@ class GameConsumer(AsyncWebsocketConsumer):
   
 
 		# PLAYER CREATION
-		player = models.Player("hajar")
-		players.append(player);
+		self.keycode= 0
+		players.append(self);
 
 		# # GAME LAUNCH
 		if (len(players) >= 2):
-			asyncio.create_task(game.animation(self.channel_layer));
-			# await task
-			# print(task)
+			self.name = "second"
+			second = players.pop()
+			first = players.pop()
+			asyncio.create_task(game.animation(self.channel_layer, first, second));
+		else:
+			self.name = "first"
 
 	async def receive(self, text_data):
 		dataJson = json.loads(text_data)
-		data = dataJson['data']
-		await self.channel_layer.group_send(
-			"test",
-			{
-				'type': 'create_msg',
-				'data': data
-	   		}
-		)
+		if (dataJson['type'] == 'keycode'):
+			data = dataJson['data']
+		self.keycode = data
+  
+		
 	
 	async def create_msg(self, event):
 		data = event['data']
