@@ -14,9 +14,9 @@ class GameConsumer(AsyncWebsocketConsumer):
 		# # INTERNAL CONNECTION
 		await self.accept()
 		await self.channel_layer.group_add("test",self.channel_name)
-  
+		print("path = ", self.scope["path"])
 
-		# PLAYER CREATION
+		# # PLAYER CREATION
 		self.keycode= 0
 		players.append(self);
 

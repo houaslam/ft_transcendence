@@ -118,14 +118,14 @@ async def animation(channel_layer, first, second):
 		otherPlayer.update(plane, ball)
 
 		if (first.keycode == 37):
-			player.position[0] -= 0.5
+			player.position[0] -= 0.2
 		elif (first.keycode == 39):
-			player.position[0] += 0.5
+			player.position[0] += 0.2
 
 		if (second.keycode == 68):
-			otherPlayer.position[0] -= 0.5
+			otherPlayer.position[0] -= 0.2
 		elif (second.keycode == 65):
-			otherPlayer.position[0] += 0.5
+			otherPlayer.position[0] += 0.2
 
 		first.keycode = 0
 		second.keycode = 0
@@ -143,23 +143,3 @@ async def animation(channel_layer, first, second):
 				'data': allCoordinate
 			}
 		)
-		
-
-# animation()
-
-# async def animation(channel_layer):
-# 	ball = Ball([0, 0.8, 0], [0, 0.01, 0.05], [2, 32, 15])
-# 	# plane = Box()
-# 	while True:
-# 		# ball.update()
-# 		allCoordinate = {
-# 			"ball": ball.position
-# 		}
-# 		await asyncio.sleep(0.05)
-# 		await channel_layer.group_send("test",
-# 		{
-# 			'type': 'create_msg',
-# 			'data': allCoordinate
-# 		}
-# 		)
-	

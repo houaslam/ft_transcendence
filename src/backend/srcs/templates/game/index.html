@@ -6,6 +6,13 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link rel="icon" href="/favicon.ico" type="image/x-icon">
 	<title>Game</title>
+	<style>
+		*{
+
+			padding: 0px;
+			margin: 0px;
+		}
+	</style>
 
 </head>
 <body>
@@ -79,7 +86,16 @@
 			scene.add(  otherPlayer );
 			scene.add(  ball );
 
+			window.addEventListener( 'resize', onWindowResize, false );
 
+			function onWindowResize(){
+			
+			    camera.aspect = window.innerWidth / window.innerHeight;
+			    camera.updateProjectionMatrix();
+			
+			    renderer.setSize( window.innerWidth, window.innerHeight );
+			
+			}
 
 			// WEBSOCKET CONNECTION
 			gameSocket.onopen = function(e){
