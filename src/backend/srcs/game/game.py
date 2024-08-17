@@ -91,6 +91,7 @@ class Ball():
 
 			else:
 				otherplayer.score += 1
+				print(otherplayer.score)
 				self.reset()
 
 		if (self.front <= otherplayer.back  and self.velocity[2] < 0):
@@ -102,7 +103,7 @@ class Ball():
 
 			else:
 				self.reset()
-				player += 1
+				player.score += 1
 
 		self.position[0] += self.velocity[0]
 		self.position[1] -= self.velocity[1]
@@ -118,9 +119,10 @@ async def animation(channel_layer, first, second):
 	otherPlayer = Player([0,.4,-plane.dimension[2]/2 + .3], [0,-.1,.05], [1,.3,.3])
 
 	while True:
-		ball.update(plane, player, otherPlayer)
+
 		player.update(plane)
 		otherPlayer.update(plane)
+		ball.update(plane, player, otherPlayer)
 
 		if (first.keycode == 37):
 			player.position[0] -= 0.2
@@ -134,7 +136,7 @@ async def animation(channel_layer, first, second):
 
 		first.keycode = 0
 		second.keycode = 0
-
+		print("SCORE = " , otherPlayer.score)
 		allCoordinate = {
 				"ball" :{"position": ball.position},
 				"player":{

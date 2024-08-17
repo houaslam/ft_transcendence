@@ -2,19 +2,32 @@
 
     padding: 0px;
     margin: 0px;
+    overflow: hidden;
+}
+
+body{
+    /* background-color: springgreen; */
 }
 
 #player_score{
+    /* position:absolute; */
     z-index: 2;
     color: white;
 }
 
 #other_score{
+    /* position:absolute; */
     z-index: 2;
     color: white
 }
 
-.game{
+#scores{
+    display: flex;
+    flex-direction:row;
+    gap: 20px;
+    position:relative;
     z-index: 2;
-    
+    color: white;
+    background-color: red;
+    /* margin-top: 50px; */
 }

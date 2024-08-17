@@ -8,6 +8,9 @@
 	<link rel="icon" href="/favicon.ico" type="image/x-icon">
 	<title>Game</title>
 	<link rel="stylesheet" href="{% static '/css/style.css' %}">
+	<style>
+
+	</style>
 
 </head>
 <body>
@@ -15,11 +18,13 @@
 	<main id="canva">
 
 		<h1 id='game'></h1>
-		<div class="scores">
-			<h2 id="player_score"> YOU </h2>
-			<h2 id="other_score"> OTHER </h2>
+
+		<div id="scores">
+			<h2 id="player_score">0</h2>
+			<h2 id="other_score">0</h2>
 		</div>
-			<button id="play">Play!</button>
+
+		<button id="play">Play!</button>
 
 		<script type="module"  src="{% static '/js/game.js' %}">
 			</script>
