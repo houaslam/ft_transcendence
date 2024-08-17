@@ -20,5 +20,5 @@ from game.urls import *
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include( "game.urls" ) )
+    path('ws/game/', include( "game.urls" ) )
 ]

@@ -3,7 +3,6 @@ import { OrbitControls } from 'https://cdn.skypack.dev/three@0.129.0/examples/js
 
 
 let playBtn = document.getElementById("play")
-console.log("HELLO ")
 
 playBtn.addEventListener("click", (e)=>{
     e.preventDefault()
@@ -101,9 +100,10 @@ playBtn.addEventListener("click", (e)=>{
                 ball.position.set(coordinates.ball.position[0], coordinates.ball.position[1], coordinates.ball.position[2])
                 player.position.set(coordinates.player.position[0], coordinates.player.position[1], coordinates.player.position[2])
                 otherPlayer.position.set(coordinates.otherPlayer.position[0], coordinates.otherPlayer.position[1], coordinates.otherPlayer.position[2])
+
+                
             }
             ball.rotation.x += 0.1
-            
         }
         renderer.render( scene, camera );
     }

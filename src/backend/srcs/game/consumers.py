@@ -18,14 +18,14 @@ class GameConsumer(AsyncWebsocketConsumer):
 
 		# # PLAYER CREATION
 		self.keycode= 0
-		players.append(self);
+		players.append(self)
 
 		# # GAME LAUNCH
 		if (len(players) >= 2):
 			self.name = "second"
 			second = players.pop()
 			first = players.pop()
-			asyncio.create_task(game.animation(self.channel_layer, first, second));
+			asyncio.create_task(game.animation(self.channel_layer, first, second))
 		else:
 			self.name = "first"
 
