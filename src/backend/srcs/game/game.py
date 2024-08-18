@@ -110,7 +110,7 @@ class Ball():
 		self.position[2] += self.velocity[2]
 
 
-async def animation(channel_layer, first, second):
+async def startGame(channel_layer, first, second):
 	# 			position,  		 velocity,   		 dimension,         mOde (player)
 	#			   x    y   z	    x   y   z		 x  y  z	
 	ball = Ball( [ 0 , .8 , 0 ], [ .01,.01,.01 ], [ .2,32,15 ] )
@@ -136,7 +136,10 @@ async def animation(channel_layer, first, second):
 
 		first.keycode = 0
 		second.keycode = 0
-		print("SCORE = " , otherPlayer.score)
+		print("first point = " , first.match.points)
+		print("second point = " , second.match.points)
+		first.match.points = player.score
+		second.match.points = otherPlayer.score
 		allCoordinate = {
 				"ball" :{"position": ball.position},
 				"player":{

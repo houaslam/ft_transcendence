@@ -1,7 +1,7 @@
 import json, time, asyncio
 from channels.generic.websocket import WebsocketConsumer, AsyncWebsocketConsumer
 from channels.layers import get_channel_layer
-from asgiref.sync import async_to_sync
+from asgiref.sync import async_to_sync, sync_to_async
 from collections import deque
 from . import models,  game
 
@@ -21,11 +21,17 @@ class GameConsumer(AsyncWebsocketConsumer):
 		players.append(self)
 
 		# # GAME LAUNCH
+		match = models.Game( points=0, type="MP")
+		await sync_to_async(match.save)()
+		user = models.Player(name="user", game=match)
+		await sync_to_async(user.save)()
+
+		self.match = match
 		if (len(players) >= 2):
 			self.name = "second"
 			second = players.pop()
 			first = players.pop()
-			asyncio.create_task(game.animation(self.channel_layer, first, second))
+			asyncio.create_task(game.startGame(self.channel_layer, first, second))
 		else:
 			self.name = "first"
 
