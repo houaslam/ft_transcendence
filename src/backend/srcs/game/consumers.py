@@ -27,12 +27,9 @@ class GameConsumer(AsyncWebsocketConsumer):
 
 		self.match = match
 		if (len(players) >= 2):
-			self.name = "second"
 			second = players.pop()
 			first = players.pop()
 			asyncio.create_task(game.startGame(self.channel_layer, first, second))
-		else:
-			self.name = "first"
 
 	async def receive(self, text_data):
 		dataJson = json.loads(text_data)
@@ -40,8 +37,6 @@ class GameConsumer(AsyncWebsocketConsumer):
 			data = dataJson['data']
 		self.keycode = data
   
-
-	
 	async def create_msg(self, event):
 		data = event['data']
 		await self.send(text_data=json.dumps({
