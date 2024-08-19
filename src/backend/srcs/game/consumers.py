@@ -14,17 +14,16 @@ class GameConsumer(AsyncWebsocketConsumer):
 		# # INTERNAL CONNECTION
 		await self.accept()
 		await self.channel_layer.group_add("test",self.channel_name)
-		print("path = ", self.scope["path"])
 
 		# # PLAYER CREATION
 		self.keycode= 0
 		players.append(self)
 
 		# # GAME LAUNCH
-		match = models.Game( points=0, type="MP")
-		await sync_to_async(match.save)()
-		user = models.Player(name="user", game=match)
+		user = models.Player(name="user")
 		await sync_to_async(user.save)()
+		match = models.Game( points=0, type="MP", player_id=user.pk)
+		await sync_to_async(match.save)()
 
 		self.match = match
 		if (len(players) >= 2):
@@ -41,7 +40,7 @@ class GameConsumer(AsyncWebsocketConsumer):
 			data = dataJson['data']
 		self.keycode = data
   
-		
+
 	
 	async def create_msg(self, event):
 		data = event['data']

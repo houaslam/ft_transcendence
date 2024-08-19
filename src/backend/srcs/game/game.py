@@ -1,5 +1,6 @@
 from . import models, consumers
 import json, time, asyncio, random
+from asgiref.sync import async_to_sync, sync_to_async
 from channels.layers import get_channel_layer
 
 class Plane():
@@ -119,27 +120,31 @@ async def startGame(channel_layer, first, second):
 	otherPlayer = Player([0,.4,-plane.dimension[2]/2 + .3], [0,-.1,.05], [1,.3,.3])
 
 	while True:
-
+	#  ELEMETS UPDATE
 		player.update(plane)
 		otherPlayer.update(plane)
 		ball.update(plane, player, otherPlayer)
 
+	# MOVEMENT 
+
+		# PLAYER MOVEMENT
 		if (first.keycode == 37):
 			player.position[0] -= 0.2
 		elif (first.keycode == 39):
 			player.position[0] += 0.2
-
+		# OTHER ONE MOVEMENT
 		if (second.keycode == 37):
 			otherPlayer.position[0] += 0.2
 		elif (second.keycode == 39):
 			otherPlayer.position[0] -= 0.2
-
 		first.keycode = 0
 		second.keycode = 0
-		print("first point = " , first.match.points)
-		print("second point = " , second.match.points)
+
+	# SCORE 
 		first.match.points = player.score
 		second.match.points = otherPlayer.score
+	
+	# SEND TO FRONT
 		allCoordinate = {
 				"ball" :{"position": ball.position},
 				"player":{
@@ -151,11 +156,24 @@ async def startGame(channel_layer, first, second):
 					"score": otherPlayer.score
 					}
 		}
-
-		await asyncio.sleep(0.04)
 		await channel_layer.group_send("test",
 			{
 				'type': 'create_msg',
 				'data': allCoordinate
 			}
 		)
+
+		await asyncio.sleep(0.04)
+		if (player.score > 2 or otherPlayer.score > 2):
+			break
+
+	# SAVE TO DATABASE
+	if (player.score > otherPlayer.score):
+		first.match.gameStatus = "W"
+		second.match.gameStatus = "L"
+	else:
+		second.match.gameStatus = "W"
+		first.match.gameStatus = "L"
+
+	await sync_to_async(first.match.save)()
+	await sync_to_async(second.match.save)()
