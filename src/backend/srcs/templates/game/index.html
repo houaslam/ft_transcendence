@@ -25,7 +25,15 @@
 		<button id="play">INVITE!</button>
 		<button id="multi">MULTI!</button>
 
-		<script type="module"  src="{% static '/js/game.js' %}">
+		<script type="module"  >
+			import * as INVITE from  "{% static '/js/game.js' %}"
+			import * as MULTI from  "{% static '/js/multiPlayer.js' %}"
+
+			let playBtn = document.getElementById("play");
+			let multiBtn = document.getElementById("multi");
+			
+			playBtn.addEventListener("click", INVITE.start);
+			multiBtn.addEventListener("click", MULTI.start);
 			</script>
 			
 			
