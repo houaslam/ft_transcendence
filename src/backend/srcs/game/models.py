@@ -7,6 +7,7 @@ class Game(models.Model):
 	class gameType(models.TextChoices):
 		TR = "TR",  "tournament"
 		MP = "MP", "multiplayer"
+		VS = "VS", "inviteFriend"
 
 	class status(models.TextChoices):
 		W = "W",  "win"

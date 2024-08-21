@@ -47,13 +47,6 @@ class Player():
 		if (self.bottom > plane.top):
 			self.position[1] += self.velocity[1]
 		self.velocity[1] = 0
-	
-	def move(self, keycode):
-		if (keycode == 37):
-			self.position[0] -= 0.2
-		elif (keycode == 39):
-			self.position[0] += 0.2
-		self.keycode = 0
 
 
 class Ball():
@@ -133,8 +126,19 @@ async def startGame(channel_layer, first, second):
 		ball.update(plane, player, otherPlayer)
 
 	# MOVEMENT 
-		player.move(first.keycode)
-		otherPlayer.move(second.keycode)
+
+		# PLAYER MOVEMENT
+		if (first.keycode == 37):
+			player.position[0] -= 0.2
+		elif (first.keycode == 39):
+			player.position[0] += 0.2
+		# OTHER ONE MOVEMENT
+		if (second.keycode == 37):
+			otherPlayer.position[0] += 0.2
+		elif (second.keycode == 39):
+			otherPlayer.position[0] -= 0.2
+		first.keycode = 0
+		second.keycode = 0
 
 	# SCORE 
 		first.match.points = player.score
