@@ -1,11 +1,7 @@
 import * as THREE from 'https://cdnjs.cloudflare.com/ajax/libs/three.js/0.167.0/three.module.js'
 import { OrbitControls } from 'https://cdn.skypack.dev/three@0.129.0/examples/jsm/controls/OrbitControls.js';
 
-let playBtn = document.getElementById("play");
-let multiBtn = document.getElementById("multi");
-export function  start(e){
-	e.preventDefault()
-
+export function  start(){
 
 	let player_score = document.getElementById("player_score")
 	let other_score = document.getElementById("other_score")
@@ -13,8 +9,6 @@ export function  start(e){
 
 	let url = `ws://${window.location.host}/ws/multi/`
 	const gameSocket = new WebSocket(url)
-	multiBtn.style.display = "none"
-	playBtn.style.display = "none"
 	scores.style.display = "flex"
 	
 	let camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
@@ -35,7 +29,7 @@ export function  start(e){
 	let ball, player, otherPlayer, plane;
 	
 	//PLANE
-	plane = new THREE.Mesh(new THREE.BoxGeometry( 3, .2, 5 ), new THREE.MeshLambertMaterial( { color:0x005599 } ))
+	plane = new THREE.Mesh(new THREE.BoxGeometry( 5, .2, 5 ), new THREE.MeshLambertMaterial( { color:0x005599 } ))
 	
 	// 	BALL
 	ball = new THREE.Mesh( new THREE.SphereGeometry( .2, 32, 15 ), new THREE.MeshLambertMaterial( { color:0xffffff, wireframe: true} ))

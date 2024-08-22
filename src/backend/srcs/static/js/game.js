@@ -2,10 +2,8 @@ import * as THREE from 'https://cdnjs.cloudflare.com/ajax/libs/three.js/0.167.0/
 import { OrbitControls } from 'https://cdn.skypack.dev/three@0.129.0/examples/jsm/controls/OrbitControls.js';
 
 
-let playBtn = document.getElementById("play");
-let multiBtn = document.getElementById("multi");
-export function  start(e){
-	e.preventDefault()
+
+export function  start(){
 
 
 	let player_score = document.getElementById("player_score")
@@ -16,8 +14,6 @@ export function  start(e){
 	const gameSocket = new WebSocket(url)
 
 
-	multiBtn.style.display = "none"
-	playBtn.style.display = "none"
 	scores.style.display = "flex"
 	
 	let camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
