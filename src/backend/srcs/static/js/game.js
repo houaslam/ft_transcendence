@@ -14,6 +14,8 @@ export function  start(e){
 
 	let url = `ws://${window.location.host}/ws/game/`
 	const gameSocket = new WebSocket(url)
+
+
 	multiBtn.style.display = "none"
 	playBtn.style.display = "none"
 	scores.style.display = "flex"

@@ -11,7 +11,7 @@ players=deque()
 class GameConsumer(AsyncWebsocketConsumer):
 
 	async def connect(self):
-
+		print("MULTI")
 		# # INTERNAL CONNECTION
 		await self.accept()
 		await self.channel_layer.group_add("test",self.channel_name)
