@@ -26,24 +26,43 @@ export function  start(){
 	// SCENE
 	const scene = new THREE.Scene(  );
 	
-	let ball, player, otherPlayer, plane;
+	let ball, player1, player2, player3, player4, plane;
 	
 	//PLANE
-	plane = new THREE.Mesh(new THREE.BoxGeometry( 5, .2, 5 ), new THREE.MeshLambertMaterial( { color:0x005599 } ))
+	plane = new THREE.Mesh(
+		new THREE.BoxGeometry( 5, .2, 5 ),
+		new THREE.MeshLambertMaterial( { color:0x005599 } ))
 	
 	// 	BALL
-	ball = new THREE.Mesh( new THREE.SphereGeometry( .2, 32, 15 ), new THREE.MeshLambertMaterial( { color:0xffffff, wireframe: true} ))
+	ball = new THREE.Mesh( 
+		new THREE.SphereGeometry( .2, 32, 15 ),
+		new THREE.MeshLambertMaterial( { color:0xffffff} ))
 	ball.position.set( 0, .8, 0 )
 	
 	// PLAYER
-	player = new THREE.Mesh(new THREE.BoxGeometry( 1, .3, .3 ), new THREE.MeshLambertMaterial( { color:0xffffff } ))
-	player.position.set( 0, .4 , 2.7 )
+	player1 = new THREE.Mesh(
+		new THREE.BoxGeometry( 1, .3, .3 ), 
+		new THREE.MeshLambertMaterial( { color:0xff99ff } ))
+	player1.position.set( 0, .4 , 2.5)
+
+	player2 = new THREE.Mesh(
+		new THREE.BoxGeometry( 1, .3, .3 ), 
+		new THREE.MeshLambertMaterial( { color:0xffff88 } ))
+	player2.position.set( 0, .4 , -2.5)
+
+	player3 = new THREE.Mesh(
+		new THREE.BoxGeometry( 1, .3, .3 ), 
+		new THREE.MeshLambertMaterial( { color:0x22ffff } ))
+	player3.position.set( 2.5, .4 , 0)
+	player3.rotation.y = Math.PI/2
 	
-	
-	//OTHERPLAYER
-	otherPlayer =  new THREE.Mesh(new THREE.BoxGeometry( 1, .3, .3 ), new THREE.MeshLambertMaterial( { color:0x005500 } ))
-	otherPlayer.position.set( 0, .4 , -2.7 )
-	
+	player4 = new THREE.Mesh(
+		new THREE.BoxGeometry( 1, .3, .3 ), 
+		new THREE.MeshLambertMaterial( { color:0xff9900 } ))
+	player4.position.set( -2.5, .4 , 0)
+	player4.rotation.y = Math.PI/2
+
+
 	// ORBIT CONTROLER
 	const orbit = new OrbitControls( camera, renderer.domElement )
 	
@@ -60,8 +79,10 @@ export function  start(){
 	scene.add(  light  );
 	scene.add(  axesHelper  );
 	scene.add(  plane );
-	scene.add(  player );
-	scene.add(  otherPlayer );
+	scene.add(  player1 );
+	scene.add(  player2 );
+	scene.add(  player3 );
+	scene.add(  player4 );
 	scene.add(  ball );
 	
 	window.addEventListener( 'resize', onWindowResize, false );
@@ -82,7 +103,7 @@ export function  start(){
 	
 	// KEY EVENT
 	document.addEventListener('keydown', (event) => {
-		e.preventDefault()
+		// event.preventDefault()
 		gameSocket.send(JSON.stringify({
 			'type': 'keycode',
 			'data': event.keyCode
@@ -99,10 +120,13 @@ export function  start(){
 				let coordinates = dataJson['data']
 				
 				ball.position.set(coordinates.ball.position[0], coordinates.ball.position[1], coordinates.ball.position[2])
-				player.position.set(coordinates.player.position[0], coordinates.player.position[1], coordinates.player.position[2])
-				otherPlayer.position.set(coordinates.otherPlayer.position[0], coordinates.otherPlayer.position[1], coordinates.otherPlayer.position[2])
+				player1.position.set(coordinates.player1.position[0], coordinates.player1.position[1], coordinates.player1.position[2])
+				player2.position.set(coordinates.player2.position[0], coordinates.player2.position[1], coordinates.player2.position[2])
+				player3.position.set(coordinates.player3.position[0], coordinates.player3.position[1], coordinates.player3.position[2])
+				player4.position.set(coordinates.player4.position[0], coordinates.player4.position[1], coordinates.player4.position[2])
+				
 				player_score.innerHTML = coordinates.player.score;
-				other_score.innerHTML = coordinates.otherPlayer.score;
+				other_score.innerHTML = coordinates.player4.score;
 
 			}
 			ball.rotation.x += 0.1

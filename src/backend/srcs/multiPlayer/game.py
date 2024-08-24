@@ -69,7 +69,7 @@ class Ball():
 		self.left = self.position[0] - self.dimension[0]
 		self.right = self.position[0] + self.dimension[0]
 
-	def update(self, plane, player, otherplayer):
+	def update(self, plane, player, player2):
 		self.updateBounds()
 		self.velocity[1] += 0.03
 		
@@ -91,13 +91,13 @@ class Ball():
 					self.velocity[2] *= -1
 
 			else:
-				otherplayer.score += 1
-				print(otherplayer.score)
+				player2.score += 1
+				print(player2.score)
 				self.reset()
 
-		if (self.front <= otherplayer.back  and self.velocity[2] < 0):
-			if (self.left >= otherplayer.left - self.dimension[0] and self.right <= otherplayer.right + self.dimension[0]) :
-				hitpont = (self.position[0] - otherplayer.position[0]) / player.dimension[0]
+		if (self.front <= player2.back  and self.velocity[2] < 0):
+			if (self.left >= player2.left - self.dimension[0] and self.right <= player2.right + self.dimension[0]) :
+				hitpont = (self.position[0] - player2.position[0]) / player.dimension[0]
 				self.velocity[0] = hitpont * 0.05
 				self.velocity[2] -= 0.01
 				self.velocity[2] *= -1
@@ -111,49 +111,61 @@ class Ball():
 		self.position[2] += self.velocity[2]
 
 
-async def startGame(channel_layer, first, second):
+async def startGame(channel_layer, players):
 	# 			position,  		 velocity,   		 dimension,         mOde (player)
 	#			   x    y   z	    x   y   z		 x  y  z	
 	ball = Ball( [ 0 , .8 , 0 ], [ .01,.01,.01 ], [ .2,32,15 ] )
 	plane = Plane([0,0,0], [.01,.01,.05], [3,.2,5])
-	player = Player([0,.4,plane.dimension[2]/2 - .3], [0,-.1,.05], [1,.3,.3])
-	otherPlayer = Player([0,.4,-plane.dimension[2]/2 + .3], [0,-.1,.05], [1,.3,.3])
 
+	player1 = Player([0,.4,plane.dimension[2]/2 - .3], [0,-.1,.05], [1,.3,.3])
+	player2 = Player([0,.4,-plane.dimension[2]/2 + .3], [0,-.1,.05], [1,.3,.3])
+
+	player3 = Player([ 2.5 , .4 , 0 ], [ 0 , -.1 , .05 ], [ 1, .3 , .3 ])
+	player4 = Player([ -2.5 , .4 , 0 ], [ 0 , -.1 , .05 ], [ 1 , .3 , .3 ])
+	# print("PLAYERS == ", players)
+	actualplayers = [player1, player2, player3, player4]
 	while True:
 	#  ELEMETS UPDATE
-		player.update(plane)
-		otherPlayer.update(plane)
-		ball.update(plane, player, otherPlayer)
+		player1.update(plane)
+		player2.update(plane)
+		player3.update(plane)
+		player4.update(plane)
+		ball.update(plane, player1, player2)
 
 	# MOVEMENT 
 
 		# PLAYER MOVEMENT
-		if (first.keycode == 37):
-			player.position[0] -= 0.2
-		elif (first.keycode == 39):
-			player.position[0] += 0.2
-		# OTHER ONE MOVEMENT
-		if (second.keycode == 37):
-			otherPlayer.position[0] += 0.2
-		elif (second.keycode == 39):
-			otherPlayer.position[0] -= 0.2
-		first.keycode = 0
-		second.keycode = 0
+		for i in range(len(players)):
+			# print("USER -----> " ,user.name)
+			if (players[i].keycode == 37):
+					actualplayers[i].position[0] -= 0.2
+			elif (players[i].keycode == 39):
+				actualplayers[i].position[0] += 0.2
+			players[i].keycode = 0;
+		# break
 
 	# SCORE 
-		first.match.points = player.score
-		second.match.points = otherPlayer.score
+		# first.match.points = player1.score
+		# second.match.points = player2.score
 	
 	# SEND TO FRONT
 		allCoordinate = {
 				"ball" :{"position": ball.position},
-				"player":{
-					"position":player.position, 
-			  		"score":player.score
+				"player1":{
+					"position":player1.position, 
+			  		"score":player1.score
 				},
-				"otherPlayer":{
-					"position": otherPlayer.position,
-					"score": otherPlayer.score
+				"player2":{
+					"position": player2.position,
+					"score": player2.score
+					},
+				"player3":{
+					"position": player3.position,
+					"score": player3.score
+					},
+				"player4":{
+					"position": player4.position,
+					"score": player4.score
 					}
 		}
 		await channel_layer.group_send("test",
@@ -164,16 +176,16 @@ async def startGame(channel_layer, first, second):
 		)
 
 		await asyncio.sleep(0.04)
-		if (player.score > 2 or otherPlayer.score > 2):
+		if (player1.score > 2 or player2.score > 2):
 			break
 
 	# SAVE TO DATABASE
-	if (player.score > otherPlayer.score):
-		first.match.gameStatus = "W"
-		second.match.gameStatus = "L"
-	else:
-		second.match.gameStatus = "W"
-		first.match.gameStatus = "L"
+	# if (player1.score > player2.score):
+	# 	first.match.gameStatus = "W"
+	# 	second.match.gameStatus = "L"
+	# else:
+	# 	second.match.gameStatus = "W"
+	# 	first.match.gameStatus = "L"
 
-	await sync_to_async(first.match.save)()
-	await sync_to_async(second.match.save)()
+	# await sync_to_async(first.match.save)()
+	# await sync_to_async(second.match.save)()

@@ -17,6 +17,7 @@ class GameConsumer(AsyncWebsocketConsumer):
 		await self.channel_layer.group_add("test",self.channel_name)
 
 		# # PLAYER CREATION
+		# self.name = input("NAME:")
 		self.keycode= 0
 		players.append(self)
 
@@ -32,9 +33,11 @@ class GameConsumer(AsyncWebsocketConsumer):
 			third = players.pop()
 			second = players.pop()
 			first = players.pop()
-			asyncio.create_task(game.startGame(self.channel_layer, first, second, third, fourth))
+			playersarr = [first, second, third, fourth]
+			asyncio.create_task(game.startGame(self.channel_layer, playersarr))
 
 	async def receive(self, text_data):
+		# print("USER SEND : ", self.name)
 		dataJson = json.loads(text_data)
 		if (dataJson['type'] == 'keycode'):
 			data = dataJson['data']
