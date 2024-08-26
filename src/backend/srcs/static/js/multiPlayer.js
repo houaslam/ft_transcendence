@@ -54,13 +54,11 @@ export function  start(){
 		new THREE.BoxGeometry( 1, .3, .3 ), 
 		new THREE.MeshLambertMaterial( { color:0x22ffff } ))
 	player3.position.set( 2.5, .4 , 0)
-	player3.rotation.y = Math.PI/2
 	
 	player4 = new THREE.Mesh(
 		new THREE.BoxGeometry( 1, .3, .3 ), 
 		new THREE.MeshLambertMaterial( { color:0xff9900 } ))
 	player4.position.set( -2.5, .4 , 0)
-	player4.rotation.y = Math.PI/2
 
 
 	// ORBIT CONTROLER

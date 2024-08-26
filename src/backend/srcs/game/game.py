@@ -99,7 +99,6 @@ class Ball():
 
 			else:
 				otherplayer.score += 1
-				print(otherplayer.score)
 				self.reset()
 
 		if (self.front <= otherplayer.back  and self.velocity[2] < 0):

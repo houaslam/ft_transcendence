@@ -11,7 +11,6 @@ players=deque()
 class GameConsumer(AsyncWebsocketConsumer):
 
 	async def connect(self):
-		print("MULTI")
 		# # INTERNAL CONNECTION
 		await self.accept()
 		await self.channel_layer.group_add("test",self.channel_name)
@@ -37,7 +36,6 @@ class GameConsumer(AsyncWebsocketConsumer):
 			asyncio.create_task(game.startGame(self.channel_layer, playersarr))
 
 	async def receive(self, text_data):
-		# print("USER SEND : ", self.name)
 		dataJson = json.loads(text_data)
 		if (dataJson['type'] == 'keycode'):
 			data = dataJson['data']
