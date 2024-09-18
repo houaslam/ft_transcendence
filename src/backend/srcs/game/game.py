@@ -48,10 +48,10 @@ class Player():
 			self.position[1] += self.velocity[1]
 		self.velocity[1] = 0
 	
-	def move(self, keycode):
-		if (keycode == 37):
+	def move(self, keycode, plane):
+		if (keycode == 37 and self.position[0] > -plane.dimension[0] / 2 + self.dimension[0] / 2):
 			self.position[0] -= 0.2
-		elif (keycode == 39):
+		elif (keycode == 39 and self.position[0] < plane.dimension[0] / 2 - self.dimension[0] / 2):
 			self.position[0] += 0.2
 
 
@@ -134,8 +134,8 @@ async def startGame(channel_layer, first, second):
 		if (first.keycode == -1 or second.keycode == -1):
 			message = 'disconnect'
 			break
-		player.move(first.keycode)
-		otherPlayer.move(second.keycode)
+		player.move(first.keycode, plane)
+		otherPlayer.move(second.keycode, plane)
 		first.keycode = 0
 		second.keycode = 0
 
