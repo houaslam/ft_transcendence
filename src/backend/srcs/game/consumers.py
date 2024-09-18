@@ -12,18 +12,21 @@ class GameConsumer(AsyncWebsocketConsumer):
 	async def connect(self):
 
 		# # INTERNAL CONNECTION
+		user = self.scope['user']
+		print(user)
+
 		await self.accept()
-		await self.channel_layer.group_add("test",self.channel_name)
+		await self.channel_layer.group_add("invite",self.channel_name)
 
 		# # PLAYER CREATION
 		self.keycode= 0
 		players.append(self)
 
 		# # GAME LAUNCH
-		user = models.Player(name="user")
-		await sync_to_async(user.save)()
-		match = models.Game( points=0, type="VS", player_id=user.pk)
-		await sync_to_async(match.save)()
+		user = models.Player( name="user" )
+		await sync_to_async( user.save )()
+		match = models.Game( points=0, type="VS", player_id=user.pk )
+		await sync_to_async( match.save )()
 
 		self.match = match
 		if (len(players) >= 2):
@@ -37,12 +40,20 @@ class GameConsumer(AsyncWebsocketConsumer):
 			data = dataJson['data']
 		self.keycode = data
   
-	async def create_msg(self, event):
+	async def coordinates(self, event):
 		data = event['data']
 		await self.send(text_data=json.dumps({
-			'type': 'msg',
+			'type': 'coordinates',
+			'data': data
+		}))
+	
+	async def message(self, event):
+		data = event['data']
+		await self.send(text_data=json.dumps({
+			'type': 'message',
 			'data': data
 		}))
  
 	async def disconnect(self, close_code):
+		self.keycode = -1
 		print("BYE BYE : ", close_code)

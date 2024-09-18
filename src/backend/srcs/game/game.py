@@ -53,7 +53,6 @@ class Player():
 			self.position[0] -= 0.2
 		elif (keycode == 39):
 			self.position[0] += 0.2
-		self.keycode = 0
 
 
 class Ball():
@@ -66,7 +65,7 @@ class Ball():
 
 	def reset(self):
 		self.position = [0, 0.8, 0]
-		self.velocity = [0.01, 0.01, 0.05]
+		self.velocity = [random.uniform(-0.1, 0.1), 0.01, 0.05]
 
 	def updateBounds(self) :
 		self.top= self.position[1] + self.dimension[0]
@@ -120,11 +119,11 @@ class Ball():
 async def startGame(channel_layer, first, second):
 	# 			position,  		 velocity,   		 dimension,         mOde (player)
 	#			   x    y   z	    x   y   z		 x  y  z	
-	ball = Ball( [ 0 , .8 , 0 ], [ .01,.01,.01 ], [ .2,32,15 ] )
+	ball = Ball( [ 0 , .8 , 0 ], [ random.uniform(-0.1, 0.1),.01,.01 ], [ .2,32,15 ] )
 	plane = Plane([0,0,0], [.01,.01,.05], [3,.2,5])
 	player = Player([0,.4,plane.dimension[2]/2 - .3], [0,-.1,.05], [1,.3,.3])
 	otherPlayer = Player([0,.4,-plane.dimension[2]/2 + .3], [0,-.1,.05], [1,.3,.3])
-
+	message = 'endGame'
 	while True:
 	#  ELEMETS UPDATE
 		player.update(plane)
@@ -132,8 +131,14 @@ async def startGame(channel_layer, first, second):
 		ball.update(plane, player, otherPlayer)
 
 	# MOVEMENT 
+		if (first.keycode == -1 or second.keycode == -1):
+			message = 'disconnect'
+			break
 		player.move(first.keycode)
 		otherPlayer.move(second.keycode)
+		first.keycode = 0
+		second.keycode = 0
+
 
 	# SCORE 
 		first.match.points = player.score
@@ -151,9 +156,9 @@ async def startGame(channel_layer, first, second):
 					"score": otherPlayer.score
 					}
 		}
-		await channel_layer.group_send("test",
+		await channel_layer.group_send("invite",
 			{
-				'type': 'create_msg',
+				'type': 'coordinates',
 				'data': allCoordinate
 			}
 		)
@@ -163,7 +168,7 @@ async def startGame(channel_layer, first, second):
 			break
 
 	# SAVE TO DATABASE
-	if (player.score > otherPlayer.score):
+	if (second.keycode == -1 or player.score > otherPlayer.score):
 		first.match.gameStatus = "W"
 		second.match.gameStatus = "L"
 	else:
@@ -172,3 +177,8 @@ async def startGame(channel_layer, first, second):
 
 	await sync_to_async(first.match.save)()
 	await sync_to_async(second.match.save)()
+
+	await channel_layer.group_send("invite", {
+		'type' : 'message' ,
+		'data' : message
+	})

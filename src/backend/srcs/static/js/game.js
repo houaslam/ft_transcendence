@@ -17,8 +17,14 @@ export function  start(){
 	scores.style.display = "flex"
 	
 	let camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
-	camera.position.z = 5;
-	camera.position.y = 1;
+	// camera.position.z = 5;
+	camera.position.y = 5;
+	// camera.rotation.x = - Math.PI / 2
+	console.log( "before" , camera.rotation.y )
+	camera.rotation.y = - Math.PI 
+	console.log( camera.rotation.x )
+	console.log( "after = ", camera.rotation.y )
+
 	
 	// RENDER
 	const renderer = new THREE.WebGLRenderer(  );
@@ -34,19 +40,19 @@ export function  start(){
 	let ball, player, otherPlayer, plane;
 	
 	//PLANE
-	plane = new THREE.Mesh(new THREE.BoxGeometry( 3, .2, 5 ), new THREE.MeshLambertMaterial( { color:0x005599 } ))
+	plane = new THREE.Mesh(new THREE.BoxGeometry( 3, .2, 5 ), new THREE.MeshLambertMaterial( { color:0x5F1584 } ))
 	
 	// 	BALL
-	ball = new THREE.Mesh( new THREE.SphereGeometry( .2, 32, 15 ), new THREE.MeshLambertMaterial( { color:0xffffff, wireframe: true} ))
+	ball = new THREE.Mesh( new THREE.SphereGeometry( .2, 32, 15 ), new THREE.MeshLambertMaterial( { color:0xD43ADF } ))
 	ball.position.set( 0, .8, 0 )
 	
 	// PLAYER
-	player = new THREE.Mesh(new THREE.BoxGeometry( 1, .3, .3 ), new THREE.MeshLambertMaterial( { color:0xffffff } ))
+	player = new THREE.Mesh(new THREE.BoxGeometry( 1, .3, .3 ), new THREE.MeshLambertMaterial( { color:0x8C96ED } ))
 	player.position.set( 0, .4 , 2.7 )
 	
 	
 	//OTHERPLAYER
-	otherPlayer =  new THREE.Mesh(new THREE.BoxGeometry( 1, .3, .3 ), new THREE.MeshLambertMaterial( { color:0x005500 } ))
+	otherPlayer =  new THREE.Mesh(new THREE.BoxGeometry( 1, .3, .3 ), new THREE.MeshLambertMaterial( { color:0xE4E6FB} ))
 	otherPlayer.position.set( 0, .4 , -2.7 )
 	
 	// ORBIT CONTROLER
@@ -87,19 +93,17 @@ export function  start(){
 	
 	// KEY EVENT
 	document.addEventListener('keydown', (event) => {
-		e.preventDefault()
 		gameSocket.send(JSON.stringify({
 			'type': 'keycode',
 			'data': event.keyCode
 		}))
-		console.log(event.keyCode);
 	});
 	
 	// ANIMATION 
 	function animation(  ){ 
 		gameSocket.onmessage = function(e){
 			let dataJson = JSON.parse(e.data)
-			if (dataJson['type'] == "msg"){
+			if (dataJson['type'] == "coordinates"){
 				
 				let coordinates = dataJson['data']
 				
@@ -110,7 +114,12 @@ export function  start(){
 				other_score.innerHTML = coordinates.otherPlayer.score;
 
 			}
+			else if ( dataJson['type'] == "message" ){
+				console.log( dataJson['data'] )
+			}
 			ball.rotation.x += 0.1
+			console.log( camera.rotation.x ) 
+
 		}
 		renderer.render( scene, camera );
 	}
