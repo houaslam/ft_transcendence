@@ -49,10 +49,12 @@ class Player():
 		self.velocity[1] = 0
 	
 	def move(self, keycode, plane):
+		target = self.position[0]
 		if (keycode == 37 and self.position[0] > -plane.dimension[0] / 2 + self.dimension[0] / 2):
-			self.position[0] -= 0.2
+			target -= 0.5
 		elif (keycode == 39 and self.position[0] < plane.dimension[0] / 2 - self.dimension[0] / 2):
-			self.position[0] += 0.2
+			target += 0.5
+		self.position[0] += (target - self.position[0]) * 0.1
 
 
 class Ball():
@@ -93,7 +95,7 @@ class Ball():
 
 					hitpont = (self.position[0] - player.position[0]) / player.dimension[0]
 					self.velocity[0] = hitpont * 0.05
-					self.velocity[2] += 0.01
+					self.velocity[2] += 0.02
 					self.velocity[2] *= -1
 
 			else:
@@ -104,7 +106,7 @@ class Ball():
 			if (self.left >= otherplayer.left - self.dimension[0] and self.right <= otherplayer.right + self.dimension[0]) :
 				hitpont = (self.position[0] - otherplayer.position[0]) / player.dimension[0]
 				self.velocity[0] = hitpont * 0.05
-				self.velocity[2] -= 0.01
+				self.velocity[2] -= 0.02
 				self.velocity[2] *= -1
 
 			else:

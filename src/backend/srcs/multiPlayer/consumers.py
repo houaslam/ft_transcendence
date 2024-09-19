@@ -49,4 +49,5 @@ class GameConsumer(AsyncWebsocketConsumer):
 		}))
  
 	async def disconnect(self, close_code):
+		self.keycode =  -1
 		print("BYE BYE : ", close_code)

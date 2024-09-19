@@ -1,33 +1,38 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<title>Game</title>
-		<link rel="stylesheet" href="{% static '/css/style.css' %}">
-		<style>
 
-		</style>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game</title>
+    <link rel="stylesheet" href="{% static '/css/style.css' %}">
+    <style>
 
-	</head>
-	<body>
+    </style>
 
-		<main id="canva">
+</head>
 
-			<h1 id='game'></h1>
+<body>
 
-			<div id="scores">
-				<h2 id="player_score">0</h2>
-				<h2 id="other_score">0</h2>
-			</div>
+    <main id="canva">
 
-			<button id="play" onclick="window.location.href='/ws/game';" >INVITE!</button>
-			<button id="play" onclick="window.location.href='/ws/multi';" >MULTI!</button>
-			<button id="play" onclick="window.location.href='/ws/tournament';" >TOURNAM!</button>
-			<button id="play" onclick="window.location.href='/ws/RPC';" >RPC!</button>
-		</main>
+        <h1 id='game'></h1>
+
+        <div id="scores">
+            <h2 id="player_score">0</h2>
+            <h2 id="other_score">0</h2>
+        </div>
 
 
-	</body>
+
+        <button id="play" onclick="window.location.href='/ws/game';">INVITE!</button>
+        <button id="play" onclick="window.location.href='/ws/multi';">MULTI!</button>
+        <button id="play" onclick="window.location.href='/ws/tournament';">TOURNAM!</button>
+        <button id="play" onclick="window.location.href='/ws/RPC';">RPC!</button>
+    </main>
+
+
+</body>
+
 </html>

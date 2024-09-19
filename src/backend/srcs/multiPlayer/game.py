@@ -47,6 +47,15 @@ class Player():
 			self.position[1] += self.velocity[1]
 		self.velocity[1] = 0
 
+	def move(self, keycode, plane):
+		target = self.position[0]
+		if (keycode == 37 and self.left > - plane.dimension[0] / 2 and self.right >= plane.position[0] - self.dimension[0]):
+			target -= 0.5
+		elif (keycode == 39 and self.right< plane.dimension[0] / 2 ):
+			target += 0.5
+		self.position[0] += (target - self.position[0]) * 0.1
+
+
 class Ball():
 
 	def __init__(self, position, velocity, dimension):
@@ -57,7 +66,7 @@ class Ball():
 
 	def reset(self):
 		self.position = [0, 0.8, 0]
-		self.velocity = [0.01, 0.01, 0.05]
+		self.velocity = [random.uniform(-0.1, 0.1), 0.01, 0.05]
 
 	def updateBounds(self) :
 		self.top= self.position[1] + self.dimension[0]
@@ -107,11 +116,7 @@ class Ball():
 		self.position[2] += self.velocity[2]
 
 
-def distance(pos1, pos2):
-	return math.sqrt(math.pow((pos1[0] - pos2[0]), 2) + math.pow((pos1[1] - pos2[1]), 2) +math.pow((pos1[2] - pos2[2]), 2) )
-
-
-async def startGame(channel_layer, players):
+async def startGame(channel_layer, consumers):
 	# 			position,  		 velocity,   		 dimension,         mOde (player)
 	#			   x    y   z	    x   y   z		 x  y  z	
 	ball = Ball( [ 0 , .8 , 0 ], [ .01 , .01 , .01 ], [ .2 , 32 , 15 ] )
@@ -123,26 +128,24 @@ async def startGame(channel_layer, players):
 
 	player3 = Player( [ plane.dimension[0]/2 - .5, .4 , -(plane.dimension[2]/2 - .3) ], [ 0 , -.1 , .05 ], [ 1 , .3 , .3 ])
 	player4 = Player( [ -plane.dimension[0]/2 + .5 , .4 , -(plane.dimension[2]/2 - .3) ], [ 0 , -.1 , .05 ], [ 1 , .3 , .3 ])
-	actualplayers = [player1, player2]
-	actualplayers = [player1, player2, player3, player4]
+	
+
+	players = [player1, player2, player3, player4]
 	while True:
 	#  ELEMETS UPDATE
 		player1.update(plane)
 		player2.update(plane)
 		player3.update(plane)
 		player4.update(plane)
-		ball.update(plane, actualplayers)
+		# ball.update(plane, players)
 		# ball.update(plane, player1, player2)
 
 	# MOVEMENT 
 
 		# PLAYER MOVEMENT
-		for i in range(len(players)):
-			if (players[i].keycode == 37):
-					actualplayers[i].position[0] -= 0.2
-			elif (players[i].keycode == 39):
-				actualplayers[i].position[0] += 0.2
-			players[i].keycode = 0
+		for i in range(len(consumers)):
+			players[i].move(consumers[i].keycode, plane)
+			consumers[i].keycode = 0
 		# break
 
 	# SCORE 
