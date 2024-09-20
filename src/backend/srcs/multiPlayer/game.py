@@ -26,6 +26,7 @@ class Player():
 		self.velocity = velocity
 		self.dimension = dimension
 		self.score = 0
+		self.factor = 0.1
 		self.updateBounds()
 
 	def updateBounds(self) :
@@ -47,13 +48,20 @@ class Player():
 			self.position[1] += self.velocity[1]
 		self.velocity[1] = 0
 
-	def move(self, keycode, plane):
+	def move(self, keycode, plane, i):
 		target = self.position[0]
-		if (keycode == 37 and self.left > - plane.dimension[0] / 2 and self.right >= plane.position[0] - self.dimension[0]):
-			target -= 0.5
-		elif (keycode == 39 and self.right< plane.dimension[0] / 2 ):
-			target += 0.5
-		self.position[0] += (target - self.position[0]) * 0.1
+		if (keycode == 37 ):
+			if (i % 2 == 0 and self.left >= plane.position[0]):
+				target -= 0.5
+			elif (i%2 != 0 and self.left > - plane.dimension[0] / 2):
+				target -= 0.5
+		
+		if (keycode == 39 ):
+			if (i % 2 == 0 and  self.right <  plane.dimension[0] / 2):
+				target += 0.5
+			elif (i%2 != 0 and self.right <= plane.position[0]):
+				target += 0.5
+		self.position[0] += (target - self.position[0]) * self.factor
 
 
 class Ball():
@@ -69,12 +77,16 @@ class Ball():
 		self.velocity = [random.uniform(-0.1, 0.1), 0.01, 0.05]
 
 	def updateBounds(self) :
+		self.left = self.position[0] - self.dimension[0]
+		self.right = self.position[0] + self.dimension[0]
 		self.top= self.position[1] + self.dimension[0]
 		self.bottom = self.position[1] - self.dimension[0]
 		self.back = self.position[2] + self.dimension[0]
 		self.front = self.position[2] - self.dimension[0]
-		self.left = self.position[0] - self.dimension[0]
-		self.right = self.position[0] + self.dimension[0]
+
+	def is_out_of_bound(self, plane):
+		return (self.front < plane.front or
+	  		self.back > plane.back)
 
 	def update(self, plane, players):
 		self.updateBounds()
@@ -86,6 +98,10 @@ class Ball():
 		if (self.left <= plane.left or self.right >= plane.right):
 			self.velocity[0] *= -1
 		
+		if (self.is_out_of_bound(plane)):
+			self.reset()
+			return
+
 		for i in range(len(players)):
 			
 			if (self.back >= players[i].front and i <= 1):
@@ -98,19 +114,14 @@ class Ball():
 						self.velocity[2] += 0.01
 						self.velocity[2] *= -1
 
-			# else:
-			# 	self.reset()
 
-			if (self.front <= players[i].back and i > 1):
+			elif (self.front <= players[i].back and i > 1):
 				if (self.left >= players[i].left - self.dimension[0] and self.right <= players[i].right + self.dimension[0]) :
 					hitpont = (self.position[0] - players[i].position[0]) / players[i].dimension[0]
 					self.velocity[0] = hitpont * 0.05
 					self.velocity[2] -= 0.01
 					self.velocity[2] *= -1
-
-			# else:
-			# 	self.reset()
-
+			
 		self.position[0] += self.velocity[0]
 		self.position[1] -= self.velocity[1]
 		self.position[2] += self.velocity[2]
@@ -131,55 +142,76 @@ async def startGame(channel_layer, consumers):
 	
 
 	players = [player1, player2, player3, player4]
-	while True:
+	run = True
+	messgae = "endGame"
+	while run:
 	#  ELEMETS UPDATE
 		player1.update(plane)
 		player2.update(plane)
 		player3.update(plane)
 		player4.update(plane)
-		# ball.update(plane, players)
-		# ball.update(plane, player1, player2)
+		ball.update(plane, players)
+
 
 	# MOVEMENT 
 
 		# PLAYER MOVEMENT
 		for i in range(len(consumers)):
-			players[i].move(consumers[i].keycode, plane)
+			if (consumers[i].keycode == -1):
+				run = False
+				message = "disconnect"
+				break
+			players[i].move(consumers[i].keycode, plane, i)
 			consumers[i].keycode = 0
-		# break
 
 	# SCORE 
 
 	# SEND TO FRONT
 		allCoordinate = {
-				"ball" :{"position": ball.position},
+				"ball" :{
+					"position": ball.position
+					},
 				"player1":{
 					"position":player1.position, 
+					"dimension": player1.dimension,
 			  		"score":player1.score
 				},
 				"player2":{
 					"position": player2.position,
+					"dimension": player2.dimension,
 					"score": player2.score
 					},
 				"player3":{
 					"position": player3.position,
+					"dimension": player3.dimension,
 					"score": player3.score
 					},
 				"player4":{
 					"position": player4.position,
+					"dimension": player4.dimension,
 					"score": player4.score
-					}
+					},
+				"plane":{
+					"position": plane.position,
+					"dimension": plane.dimension,
+				}
 		}
 		await channel_layer.group_send("test",
 			{
-				'type': 'create_msg',
+				'type': 'coordinates',
 				'data': allCoordinate
 			}
 		)
 
 		await asyncio.sleep(0.04)
-		if (player1.score > 2 or player2.score > 2):
-			break
+
+	await channel_layer.group_send("test",
+			{
+				'type': 'message',
+				'data': message
+			}
+	)
+	
 
 	# SAVE TO DATABASE
 	# if (player1.score > player2.score):

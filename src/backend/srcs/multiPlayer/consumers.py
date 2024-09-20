@@ -16,7 +16,6 @@ class GameConsumer(AsyncWebsocketConsumer):
 		await self.channel_layer.group_add("test",self.channel_name)
 
 		# # PLAYER CREATION
-		# self.name = input("NAME:")
 		self.keycode= 0
 		players.append(self)
 
@@ -28,12 +27,7 @@ class GameConsumer(AsyncWebsocketConsumer):
 
 		self.match = match
 		if ( len(players) >= 4 ):
-			fourth = players.pop()
-			third = players.pop()
-			second = players.pop()
-			first = players.pop()
-			playersarr = [first, second, third, fourth]
-			asyncio.create_task(game.startGame(self.channel_layer, playersarr))
+			asyncio.create_task(game.startGame(self.channel_layer, [players.pop() for p in range(4)]))
 
 	async def receive(self, text_data):
 		dataJson = json.loads(text_data)
@@ -41,10 +35,17 @@ class GameConsumer(AsyncWebsocketConsumer):
 			data = dataJson['data']
 		self.keycode = data
   
-	async def create_msg(self, event):
+	async def coordinates(self, event):
 		data = event['data']
 		await self.send(text_data=json.dumps({
-			'type': 'msg',
+			'type': 'coordinates',
+			'data': data
+		}))
+	
+	async def message(self, event):
+		data = event['data']
+		await self.send(text_data=json.dumps({
+			'type': 'message',
 			'data': data
 		}))
  
