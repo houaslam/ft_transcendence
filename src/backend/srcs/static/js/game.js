@@ -21,8 +21,8 @@ export function endgame(state, by) {
 
 export function start() {
     let player_score = document.getElementById("player_score")
-    let canva = document.getElementById("canva")
     let other_score = document.getElementById("other_score")
+    let canva = document.getElementById("canva")
     let scores = document.getElementById("scores")
     let url = `ws://${window.location.host}/ws/game/`
     const gameSocket = new WebSocket(url)

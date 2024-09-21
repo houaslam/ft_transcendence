@@ -1,4 +1,4 @@
-{% load static %}
+<!-- {% load static %} -->
 <!DOCTYPE html>
 <html lang="en">
 
@@ -28,10 +28,27 @@
 
         <h1 id='game'></h1>
 
-        <button id="play" onclick="window.location.href='/ws/game';">INVITE!</button>
+        <!-- <button id="play" onclick="window.location.href='/ws/game';">INVITE!</button>
         <button id="play" onclick="window.location.href='/ws/multi';">MULTI!</button>
         <button id="play" onclick="window.location.href='/ws/tournament';">TOURNAM!</button>
-        <button id="play" onclick="window.location.href='/ws/RPC';">RPC!</button>
+        <button id="play" onclick="window.location.href='/ws/RPC';">RPC!</button> -->
+
+        <form id="customization">
+            <div id="gameType">
+                <div>
+                    <input type="radio" name="remote">
+                    <label for="remote">remote</label>
+                </div>
+                <div>
+                    <input type="radio" name="local">
+                    <label for="remote">local</label>
+                </div>
+                <div>
+                    <h3>choose a background</h3>
+                    <input type="file" alt="background">
+                </div>
+            </div>
+        </form>
     </main>
 
 
