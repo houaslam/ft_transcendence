@@ -204,15 +204,14 @@ async def startGame(channel_layer, consumers):
 		)
 
 		await asyncio.sleep(0.04)
-
 	await channel_layer.group_send("test",
 			{
 				'type': 'message',
 				'data': message
 			}
 	)
-	
-
+	winner = max(players, key=lambda player: player.score)
+	print ("WINNER =- ", winner)
 	# SAVE TO DATABASE
 	# if (player1.score > player2.score):
 	# 	first.match.gameStatus = "W"

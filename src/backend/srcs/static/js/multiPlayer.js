@@ -125,6 +125,7 @@ export function start() {
     function animation() {
         gameSocket.onmessage = function(e) {
             let dataJson = JSON.parse(e.data)
+            console.log(dataJson['type']);
 
             if (dataJson['type'] == "coordinates") {
 
@@ -135,6 +136,17 @@ export function start() {
                 player2.position.fromArray(coordinates.player2.position)
                 player3.position.fromArray(coordinates.player3.position)
                 player4.position.fromArray(coordinates.player4.position)
+
+            } else if (dataJson['type'] == "message") {
+                console.log("disss");
+
+                let pop = endgame(dataJson['data']);
+                canva.append(pop)
+                pop.style.transform = " translate(-50%, -50%) scale(1) "
+                let backHome = document.getElementById("back")
+                backHome.addEventListener('click', (e) => {
+                    window.location.href = '/'
+                })
 
             }
             ball.rotation.x += 0.1
