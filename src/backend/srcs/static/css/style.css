@@ -9,13 +9,3 @@ body {
     height: 100vh;
 }
 
-#scores {
-    display: flex;
-    flex-direction: row;
-    gap: 90%;
-    position: absolute;
-    color: white;
-    top: 25%;
-    left: 37%;
-    width: 25%;
-}

@@ -170,6 +170,7 @@ async def startGame(channel_layer, first, second):
 			break
 
 	# SAVE TO DATABASE
+
 	if (second.keycode == -1 or player.score > otherPlayer.score):
 		first.match.gameStatus = "W"
 		second.match.gameStatus = "L"
@@ -177,10 +178,16 @@ async def startGame(channel_layer, first, second):
 		second.match.gameStatus = "W"
 		first.match.gameStatus = "L"
 
+
+	await first.send(text_data=json.dumps({
+		'type' : 'endGame',
+		'state' : first.match.gameStatus,
+		'by' : message
+	}))
+	await second.send(text_data=json.dumps({
+		'type' : 'endGame',
+		'state' : second.match.gameStatus,
+		'by' : message
+	}))
 	await sync_to_async(first.match.save)()
 	await sync_to_async(second.match.save)()
-
-	await channel_layer.group_send("invite", {
-		'type' : 'message' ,
-		'data' : message
-	})

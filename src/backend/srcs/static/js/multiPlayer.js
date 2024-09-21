@@ -52,9 +52,6 @@ function setup(scene, camera, renderer) {
 
 }
 
-function setupEnv() {
-
-}
 
 function socketSetup() {
     let url = `ws://${window.location.host}/ws/multi/`
@@ -74,6 +71,14 @@ function socketSetup() {
 }
 
 export function start() {
+    let player1_score = document.getElementById("player1_score")
+    let player2_score = document.getElementById("player2_score")
+    let player3_score = document.getElementById("player3_score")
+    let player4_score = document.getElementById("player4_score")
+    let scores = document.getElementById("scores")
+
+    scores.style.display = "flex";
+
 
     let gameSocket = socketSetup()
 
@@ -125,7 +130,6 @@ export function start() {
     function animation() {
         gameSocket.onmessage = function(e) {
             let dataJson = JSON.parse(e.data)
-            console.log(dataJson['type']);
 
             if (dataJson['type'] == "coordinates") {
 
@@ -137,8 +141,13 @@ export function start() {
                 player3.position.fromArray(coordinates.player3.position)
                 player4.position.fromArray(coordinates.player4.position)
 
+                player1_score.innerHTML = coordinates.player1.score;
+                player2_score.innerHTML = coordinates.player2.score;
+                player3_score.innerHTML = coordinates.player3.score;
+                player4_score.innerHTML = coordinates.player4.score;
+
+
             } else if (dataJson['type'] == "message") {
-                console.log("disss");
 
                 let pop = endgame(dataJson['data']);
                 canva.append(pop)

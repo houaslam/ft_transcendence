@@ -1,19 +1,25 @@
 import * as THREE from 'https://cdnjs.cloudflare.com/ajax/libs/three.js/0.167.0/three.module.js'
 import { OrbitControls } from 'https://cdn.skypack.dev/three@0.129.0/examples/jsm/controls/OrbitControls.js';
 
-export function endgame(message) {
+export function endgame(state, by) {
     let pop = document.createElement('div')
     pop.setAttribute('id', 'popup')
+    
+    let real_state = ""
+    if (state == "W")
+        real_state = "WON"
+    else 
+        real_state = "LOST"
+    console.log("REAL = " , real_state);
     pop.innerHTML = `
-        <h4>YOU WON</h4>
-        <p>by ${message}</p>
+        <h4>YOU ${real_state}</h4>
+        <p>by ${by}</p>
         <button id="back">BACK HOME</button>
     `
     return pop
 }
 
 export function start() {
-
     let player_score = document.getElementById("player_score")
     let canva = document.getElementById("canva")
     let other_score = document.getElementById("other_score")
@@ -111,8 +117,9 @@ export function start() {
                 player_score.innerHTML = coordinates.player.score;
                 other_score.innerHTML = coordinates.otherPlayer.score;
 
-            } else if (dataJson['type'] == "message") {
-                let pop = endgame(dataJson['data']);
+            } else if (dataJson['type'] == "endGame") {
+                console.log("GYEAAAAAAAAAAAAH", dataJson['state'])
+                let pop = endgame(dataJson['state'], dataJson['by']);
                 canva.append(pop)
                 pop.style.transform = " translate(-50%, -50%) scale(1) "
                 let backHome = document.getElementById("back")
