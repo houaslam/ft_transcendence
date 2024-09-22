@@ -33,7 +33,7 @@ class GameConsumer(AsyncWebsocketConsumer):
 		dataJson = json.loads(text_data)
 		if (dataJson['type'] == 'keycode'):
 			data = dataJson['data']
-		self.keycode = data
+			self.keycode = data
   
 	async def coordinates(self, event):
 		data = event['data']
@@ -43,7 +43,6 @@ class GameConsumer(AsyncWebsocketConsumer):
 		}))
 	
 	async def message(self, event):
-		print("HELL YEAH")
 		data = event['data']
 		await self.send(text_data=json.dumps({
 			'type': 'message',

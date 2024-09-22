@@ -8,9 +8,9 @@ from . import models,  game
 players=deque()
 
 class GameConsumer(AsyncWebsocketConsumer):
-
+	gameOption = {}
 	async def connect(self):
-
+		print("YEAH")
 		# # INTERNAL CONNECTION
 		user = self.scope['user']
 		print(user)
@@ -33,12 +33,18 @@ class GameConsumer(AsyncWebsocketConsumer):
 			second = players.pop()
 			first = players.pop()
 			asyncio.create_task(game.startGame(self.channel_layer, first, second))
+		else:
+			await self.send(text_data=json.dumps({
+				'type': 'gameInfo'
+			}))
 
 	async def receive(self, text_data):
 		dataJson = json.loads(text_data)
 		if (dataJson['type'] == 'keycode'):
-			data = dataJson['data']
-		self.keycode = data
+			self.keycode = dataJson['data']
+		elif (dataJson['type'] == 'gameInfo'):
+			self.gameOption = dataJson['data']
+			
   
 	async def coordinates(self, event):
 		data = event['data']
@@ -46,13 +52,6 @@ class GameConsumer(AsyncWebsocketConsumer):
 			'type': 'coordinates',
 			'data': data
 		}))
-	
-	# async def endGame(self, event):
-	# 	data = event['data']
-	# 	await self.send(text_data=json.dumps({
-	# 		'type': 'endGame',
-	# 		'data': data
-	# 	}))
  
 	async def disconnect(self, close_code):
 		self.keycode = -1
