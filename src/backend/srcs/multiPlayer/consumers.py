@@ -12,6 +12,7 @@ class GameConsumer(AsyncWebsocketConsumer):
 
 	async def connect(self):
 		# # INTERNAL CONNECTION
+		print("NEW CONNECTION")
 		await self.accept()
 		await self.channel_layer.group_add("test",self.channel_name)
 
@@ -31,9 +32,13 @@ class GameConsumer(AsyncWebsocketConsumer):
 
 	async def receive(self, text_data):
 		dataJson = json.loads(text_data)
-		if (dataJson['type'] == 'keycode'):
+		dataType = dataJson['type']
+
+		if (dataType == 'keycode'):
 			data = dataJson['data']
 			self.keycode = data
+		elif (dataType == 'gameSettings'):
+			print(dataJson['data'])
   
 	async def coordinates(self, event):
 		data = event['data']

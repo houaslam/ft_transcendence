@@ -10,10 +10,8 @@ players=deque()
 class GameConsumer(AsyncWebsocketConsumer):
 	gameOption = {}
 	async def connect(self):
-		print("YEAH")
 		# # INTERNAL CONNECTION
 		user = self.scope['user']
-		print(user)
 
 		await self.accept()
 		await self.channel_layer.group_add("invite",self.channel_name)
@@ -33,16 +31,13 @@ class GameConsumer(AsyncWebsocketConsumer):
 			second = players.pop()
 			first = players.pop()
 			asyncio.create_task(game.startGame(self.channel_layer, first, second))
-		else:
-			await self.send(text_data=json.dumps({
-				'type': 'gameInfo'
-			}))
 
 	async def receive(self, text_data):
 		dataJson = json.loads(text_data)
-		if (dataJson['type'] == 'keycode'):
+		dataType = dataJson['type']
+		if (dataType == 'keycode'):
 			self.keycode = dataJson['data']
-		elif (dataJson['type'] == 'gameInfo'):
+		elif (dataType == 'gameSettings'):
 			self.gameOption = dataJson['data']
 			
   

@@ -1,84 +1,8 @@
 
 import * as THREE from 'https://cdnjs.cloudflare.com/ajax/libs/three.js/0.167.0/three.module.js'
 import { OrbitControls } from 'https://cdn.skypack.dev/three@0.129.0/examples/jsm/controls/OrbitControls.js';
-// import {gameOptions} from './home.js'
-
-
-let gameOptions = {}
-
-export function customizeFrom(gameSocket){
-	let form = document.createElement("form")
-	form.setAttribute('id', 'custom-form')
-	form.innerHTML = `
-	<div id="gameType">
-	<p class="label">choose game Type</p>
-	<div>
-	<input type="radio" name="type" value="remote">
-	<label for="remote">remote</label>
-	</div>
-	<div>
-	<input type="radio" name="type" value="local">
-	<label for="local">local</label>
-	</div>
-	</div>
-	
-	<div id="gameOut">
-	<p class="label">choose game Out</p>
-	<div>
-	<input type="radio" name="gameout" value="time">
-	<label for="time">time</label>
-	</div>
-	<div>
-	<input type="radio" name="gameout" value="score">
-	<label for="local">score</label>
-	</div>
-	</div>
-	
-	<div>
-	<label for="rounds" class="label">select round count</label>
-	<select name="rounds">
-	<option value="">select round</option>
-	<option>1</option>
-	<option>2</option>
-	<option>3</option>
-	<option>4</option>
-	<option>5</option>
-	</select>
-	
-	<button id="play" type="submit">PLAY</button>
-	`
-	
-	form.addEventListener('submit', (e) =>{
-		e.preventDefault()
-		let data = new FormData(form);
-		gameOptions = Object.fromEntries(data)
-		history.pushState(null, null, '/ws/game');
-		form.remove()
-		gameSocket.send(JSON.stringify({
-			'type': 'gameInfo',
-			'data': gameOptions
-		}))
-	})
-	
-	return form
-}
-
-export function endgame(state, by) {
-	let pop = document.createElement('div')
-	pop.setAttribute('id', 'popup')
-	
-	let real_state = ""
-	if (state == "W")
-		real_state = "WON"
-	else 
-		real_state = "LOST"
-	pop.innerHTML = `
-		<h4>YOU ${real_state}</h4>
-		<p>by ${by}</p>
-		<button id="back">BACK HOME</button>
-	`
-	return pop
-}
+import {gameOptions} from './settings.js'
+import { endgame,  score} from './elements.js';
 
 function socketSetup() {
 	let url = `ws://${window.location.host}/ws/game/`
@@ -86,6 +10,11 @@ function socketSetup() {
 
 	gameSocket.onopen = function(e) {
 		console.log("CONECTION ESTABLISHED")
+		gameSocket.send(JSON.stringify({
+			'type': 'gameSettings',
+			'data': gameOptions
+		}))
+		console.log("DATA SENT")
 
 	}
 
@@ -98,7 +27,7 @@ function socketSetup() {
 	return gameSocket
 }
 
-function setup(scene, camera, renderer) {
+function gameSetup(scene, camera, renderer) {
 	camera.position.z = 5;
 	camera.rotation.y = -Math.PI
 
@@ -139,13 +68,14 @@ function setup(scene, camera, renderer) {
 
 export function start() {
 	let canva = document.getElementById("canva");
+
 	const gameSocket = socketSetup()
 
 	let camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 	const renderer = new THREE.WebGLRenderer();
 	renderer.setAnimationLoop(animation);
 	const scene = new THREE.Scene();
-	setup(scene, camera, renderer)
+	gameSetup(scene, camera, renderer)
 	let ball, player, otherPlayer, plane;
 
 	//PLANE
@@ -173,34 +103,40 @@ export function start() {
 
 	// ANIMATION 
 	function animation() {
-		gameSocket.onmessage = function(e) {
+		gameSocket.onmessage = (e) => {
 
 			let dataJson = JSON.parse(e.data)
+			let dataType = dataJson['type']
 
-			if (dataJson['type'] == "coordinates") {
+			switch (dataType) 
+			{
+				case "coordinates":
+					let coordinates = dataJson['data']
+					ball.position.fromArray(coordinates.ball.position)
+					player.position.fromArray(coordinates.player.position)
+					otherPlayer.position.fromArray(coordinates.otherPlayer.position)
+					break;
+				
+				case "endGame" :
+					let pop = endgame(dataJson['state'], dataJson['by']);
+					canva.append(pop)
 
-				let coordinates = dataJson['data']
-				ball.position.fromArray(coordinates.ball.position)
-				player.position.fromArray(coordinates.player.position)
-				otherPlayer.position.fromArray(coordinates.otherPlayer.position)
+					pop.style.transform = " translate(-50%, -50%) scale(1) "
+					let backHome = document.getElementById("back")
+					backHome.addEventListener('click', (e) => {
+						window.location.href = '/'
+					})
 
-			} else if (dataJson['type'] == "endGame") {
-				let pop = endgame(dataJson['state'], dataJson['by']);
-				canva.append(pop)
-
-				pop.style.transform = " translate(-50%, -50%) scale(1) "
-				let backHome = document.getElementById("back")
-				backHome.addEventListener('click', (e) => {
-					window.location.href = '/'
-				})
-			}
-			else if (dataJson['type'] == 'gameInfo'){
-				let form = customizeFrom(gameSocket)
-				canva.append(form)
+				case 'gameInfo':
+					// let form = customizeFrom(gameSocket)
+					// canva.append(form)
+				default:
+					break;
 			}
 			ball.rotation.x += 0.1
-
 		}
 		renderer.render(scene, camera);
 	}
+
+
 }

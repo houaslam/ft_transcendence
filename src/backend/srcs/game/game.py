@@ -127,9 +127,15 @@ async def startGame(channel_layer, first, second):
 	otherPlayer = Player([0,.4,-plane.dimension[2]/2 + .3], [0,-.1,.05], [1,.3,.3])
 	message = 'endGame'
 	goal = 0
-	if (first.gameOption['gameout'] == 'score'):
-		goal =  int(first.gameOption['rounds'])
-
+	goalTime = 0
+	start = 0
+	# if (first.gameOption['gameout'] == 'score'):
+	# 	goal =  int(first.gameOption['rounds'])
+	# elif (first.gameOption['gameout'] == 'time'):
+	# 	goalTime =  int(first.gameOption['rounds'])
+	# 	start = time.time()
+	# print("SCORE = ",goal)
+	# print("TIME= ",goalTime)
 	while True:
 	#  ELEMETS UPDATE
 		player.update(plane)
@@ -170,7 +176,9 @@ async def startGame(channel_layer, first, second):
 		)
 
 		await asyncio.sleep(0.04)
-		if (player.score == goal or otherPlayer.score == goal):
+		if (goal != 0 and (player.score == goal or otherPlayer.score == goal)):
+			break
+		elif (goalTime!= 0 and time.time() - start >= goalTime):
 			break
 
 	# SAVE TO DATABASE
@@ -191,7 +199,7 @@ async def startGame(channel_layer, first, second):
 	await second.send(text_data=json.dumps({
 		'type' : 'endGame',
 		'state' : second.match.gameStatus,
-		'by' : message
+		'by' : message,
 	}))
 	await sync_to_async(first.match.save)()
 	await sync_to_async(second.match.save)()

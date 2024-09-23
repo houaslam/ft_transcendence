@@ -211,7 +211,6 @@ async def startGame(channel_layer, consumers):
 			}
 	)
 	winner = max(players, key=lambda player: player.score)
-	print ("WINNER =- ", winner)
 	# SAVE TO DATABASE
 	# if (player1.score > player2.score):
 	# 	first.match.gameStatus = "W"
