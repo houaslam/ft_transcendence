@@ -10,18 +10,16 @@ class Game(models.Model):
 		VS = "VS", "inviteFriend"
 
 	class status(models.TextChoices):
-		W = "W",  "win"
-		L = "L", "lose"
+		STARTED = "STARTED", "started"
+		WAITING = "WAITING" , "waiting"
+
 
 	type = models.CharField(max_length=2, choices=gameType.choices, default='')
+
 	created_at = models.DateTimeField(auto_now=True)
 
-	gameStatus = models.CharField(max_length=1, choices=status.choices, default='')
-	points = models.IntegerField(default=0)
 
-	player_id = models.IntegerField()
-
-	name = models.CharField(max_length=50)
+	gameStatus = models.CharField(max_length=7, choices=status.choices, default='')
 
 	def __str__(self):
 		return f"{self.pk}"
@@ -31,6 +29,7 @@ class Game(models.Model):
 
 class Player(models.Model):
 	name = models.CharField(max_length=50)
-
+	is_host = models.BooleanField(default=False)
+	game = models.ForeignKey("Game" , on_delete=models.CASCADE)
 	def __str__(self):
 		return f"{self.name}{self.pk}"

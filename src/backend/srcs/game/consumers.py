@@ -5,32 +5,51 @@ from asgiref.sync import async_to_sync, sync_to_async
 from collections import deque
 from . import models,  game
 
-players=deque()
+players=[]
 
 class GameConsumer(AsyncWebsocketConsumer):
 	gameOption = {}
 	async def connect(self):
-		# # INTERNAL CONNECTION
-		user = self.scope['user']
-
 		await self.accept()
 		await self.channel_layer.group_add("invite",self.channel_name)
 
-		# # PLAYER CREATION
 		self.keycode= 0
-		players.append(self)
 
-		# # GAME LAUNCH
-		user = models.Player( name="user" )
-		await sync_to_async( user.save )()
-		match = models.Game( points=0, type="VS", player_id=user.pk )
-		await sync_to_async( match.save )()
 
-		self.match = match
+		self.game, is_host = await self.find_or_create_game()
+		# self.player = create_player(game=game, is_host=is_host, name='test')
+
+		# players.append(self)
+		# await self.game_is_ready(self.game)
+		# if await game_is_ready()
+			# await start_game()
+
+
+
+	async def game_is_ready(self, game):
+		print("PLAYER = ", game.players_set)
+		# return game.players_set.count.
+	
+	async def find_or_create_game(self):
+		print("HAREEEEEEEEEEEE")
+		game = models.Game.objects.filter(gameStatus='waiting').first()
+		if not game :
+			game = Game.objects.create(gameStatus='waiting')
+			return game , True
+		return game, False
+
+	async def start_game():
 		if (len(players) >= 2):
+			user = models.Player( name="second" )
+			await sync_to_async( user.save )()
 			second = players.pop()
 			first = players.pop()
 			asyncio.create_task(game.startGame(self.channel_layer, first, second))
+		else :
+			match = models.Game( type="VS" )
+			user = models.Player( name="first" , game=match, is_host=True)
+			await sync_to_async( user.save )()
+			await sync_to_async( match.save )()
 
 	async def receive(self, text_data):
 		dataJson = json.loads(text_data)
