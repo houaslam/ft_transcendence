@@ -1,19 +1,10 @@
 import * as THREE from 'https://cdnjs.cloudflare.com/ajax/libs/three.js/0.167.0/three.module.js'
 import { OrbitControls } from 'https://cdn.skypack.dev/three@0.129.0/examples/jsm/controls/OrbitControls.js';
+import { customizeFrom} from './settings.js'
+import { endgame,  score, updateScore, time, updateTime} from './elements.js';
 
 
-export function endgame(message) {
-    let pop = document.createElement('div')
-    pop.setAttribute('id', 'popup')
-    pop.innerHTML = `
-        <h4>YOU WON</h4>
-        <p>by ${message}</p>
-        <button id="back">BACK HOME</button>
-    `
-    return pop
-}
-
-function setup(scene, camera, renderer) {
+function gameSetup(scene, camera, renderer) {
     camera.position.z = 5;
     camera.position.y = 1;
 
@@ -52,7 +43,6 @@ function setup(scene, camera, renderer) {
 
 }
 
-
 function socketSetup() {
     let url = `ws://${window.location.host}/ws/multi/`
     const gameSocket = new WebSocket(url)
@@ -71,14 +61,7 @@ function socketSetup() {
 }
 
 export function start() {
-    let player1_score = document.getElementById("player1_score")
-    let player2_score = document.getElementById("player2_score")
-    let player3_score = document.getElementById("player3_score")
-    let player4_score = document.getElementById("player4_score")
-    let scores = document.getElementById("scores")
-
-    scores.style.display = "flex";
-
+	let canva = document.getElementById("canva");
 
     let gameSocket = socketSetup()
 
@@ -86,37 +69,23 @@ export function start() {
     const renderer = new THREE.WebGLRenderer();
     renderer.setAnimationLoop(animation);
     const scene = new THREE.Scene();
-
-    setup(scene, camera, renderer);
-
+    gameSetup(scene, camera, renderer);
     let ball, player1, player2, player3, player4, plane;
 
     //PLANE
-    plane = new THREE.Mesh(
-        new THREE.BoxGeometry(5, .2, 5),
-        new THREE.MeshLambertMaterial({ color: 0x005599 }))
+    plane = new THREE.Mesh(new THREE.BoxGeometry(5, .2, 5),new THREE.MeshLambertMaterial({ color: 0x005599 }))
 
     // 	BALL
-    ball = new THREE.Mesh(
-        new THREE.SphereGeometry(.2, 32, 15),
-        new THREE.MeshLambertMaterial({ color: 0xffffff }))
+    ball = new THREE.Mesh(new THREE.SphereGeometry(.2, 32, 15),new THREE.MeshLambertMaterial({ color: 0xffffff }))
 
     // PLAYER
-    player1 = new THREE.Mesh(
-        new THREE.BoxGeometry(1, .3, .3),
-        new THREE.MeshLambertMaterial({ color: 0xff99ff }))
+    player1 = new THREE.Mesh(new THREE.BoxGeometry(1, .3, .3),new THREE.MeshLambertMaterial({ color: 0xff99ff }))
 
-    player2 = new THREE.Mesh(
-        new THREE.BoxGeometry(1, .3, .3),
-        new THREE.MeshLambertMaterial({ color: 0xffff88 }))
+    player2 = new THREE.Mesh(new THREE.BoxGeometry(1, .3, .3),new THREE.MeshLambertMaterial({ color: 0xffff88 }))
 
-    player3 = new THREE.Mesh(
-        new THREE.BoxGeometry(1, .3, .3),
-        new THREE.MeshLambertMaterial({ color: 0x22ffff }))
+    player3 = new THREE.Mesh(new THREE.BoxGeometry(1, .3, .3),new THREE.MeshLambertMaterial({ color: 0x22ffff }))
 
-    player4 = new THREE.Mesh(
-        new THREE.BoxGeometry(1, .3, .3),
-        new THREE.MeshLambertMaterial({ color: 0xff9900 }))
+    player4 = new THREE.Mesh(new THREE.BoxGeometry(1, .3, .3),new THREE.MeshLambertMaterial({ color: 0xff9900 }))
 
     // SCENE
 
@@ -130,7 +99,40 @@ export function start() {
     function animation() {
         gameSocket.onmessage = function(e) {
             let dataJson = JSON.parse(e.data)
+			let dataType = dataJson['type']
+            
+            switch (dataType) 
+			{
+				case "coordinates":
+					let coordinates = dataJson['data']
+					ball.position.fromArray(coordinates.ball.position)
+					player.position.fromArray(coordinates.player.position)
+					otherPlayer.position.fromArray(coordinates.otherPlayer.position)
+					updateScore(scorePanel,coordinates.player.score, coordinates.otherPlayer.score)
+					break;
+				
+				case "endGame" :
+					let pop = endgame(dataJson['state'], dataJson['by']);
+					canva.append(pop)
+					pop.style.transform = " translate(-50%, -50%) scale(1) "
+					let backHome = document.getElementById("back")
+					backHome.addEventListener('click', (e) => {
+						window.location.href = '/'
+					})
+					break;
 
+				case 'gameInfo':
+					let form = customizeFrom(gameSocket)
+					canva.append(form)
+					break;
+				
+				case 'time':
+					timePanel.style.display = 'block'
+					updateTime(timePanel, dataJson['data'])
+					break;
+				default:
+					break;
+			}
             if (dataJson['type'] == "coordinates") {
 
                 let coordinates = dataJson['data']

@@ -2,14 +2,14 @@ import json, time, asyncio
 from channels.generic.websocket import WebsocketConsumer, AsyncWebsocketConsumer
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync, sync_to_async
-from collections import deque
+from channels.db import database_sync_to_async
 from game import models
 from . import game
 
-players=deque()
+players=[]
 
 class GameConsumer(AsyncWebsocketConsumer):
-
+	gameOption = {}
 	async def connect(self):
 		# # INTERNAL CONNECTION
 		print("NEW CONNECTION")
@@ -21,14 +21,41 @@ class GameConsumer(AsyncWebsocketConsumer):
 		players.append(self)
 
 		# # GAME LAUNCH
-		user = models.Player(name="user")
-		await sync_to_async(user.save)()
-		match = models.Game( points=0, type="MP", player_id=user.pk )
-		await sync_to_async(match.save)()
+		self.is_host = await self.is_host()
+		if (self.is_host):
+			print("IS HOST")
+			await self.send(text_data=json.dumps({
+				'type' : 'gameInfo',
+				'data' : 'game_options'
+		}))
 
-		self.match = match
-		if ( len(players) >= 4 ):
-			asyncio.create_task(game.startGame(self.channel_layer, [players.pop() for p in range(4)]))
+		else:
+			print("IS INVITED")
+			self.game = await self.find_game()
+			self.game.player_count += 1
+			await sync_to_async(self.game.save)()
+			if (self.game and await self.game_is_ready(self.game) and len(players)  >= 4):
+				print("GAME GONNA START")
+				self.game.gameStatus = 'STARTED'
+				await sync_to_async(self.game.save)()
+					# await self.start_game()
+
+ 
+	@database_sync_to_async
+	def game_is_ready(self, game):
+		return game.player_count == 4
+
+	@database_sync_to_async
+	def is_host(self):
+		game = models.Game.objects.filter(gameStatus='WAITING').first()
+		if not game :
+			return  True
+		return  False
+
+	@database_sync_to_async
+	def create_game(self):
+		return models.Game.objects.create(gameStatus='WAITING', player_count=1)
+
 
 	async def receive(self, text_data):
 		dataJson = json.loads(text_data)
@@ -37,8 +64,10 @@ class GameConsumer(AsyncWebsocketConsumer):
 		if (dataType == 'keycode'):
 			data = dataJson['data']
 			self.keycode = data
-		elif (dataType == 'gameSettings'):
-			print(dataJson['data'])
+		elif (dataType == 'gameSettings' and self.is_host):
+			self.game = await self.create_game()
+			self.game.settings = dataJson['data']
+			await sync_to_async(self.game.save)()
   
 	async def coordinates(self, event):
 		data = event['data']
@@ -46,11 +75,11 @@ class GameConsumer(AsyncWebsocketConsumer):
 			'type': 'coordinates',
 			'data': data
 		}))
-	
-	async def message(self, event):
+  
+	async def time(self, event):
 		data = event['data']
 		await self.send(text_data=json.dumps({
-			'type': 'message',
+			'type': 'time',
 			'data': data
 		}))
  

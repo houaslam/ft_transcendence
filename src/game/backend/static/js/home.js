@@ -1,10 +1,20 @@
-import {start} from './game.js'
+import * as INVITE from './game.js'
+import * as MULTI from './multiPlayer.js'
 
 let vs = document.getElementById('VS')
+let multi = document.getElementById('MULTI')
 
 vs.addEventListener('click', (e) =>{
 	e.preventDefault()
 	vs.remove()
 	
-	start()
+	INVITE.start()
+})
+
+
+vs.addEventListener('click', (e) =>{
+	e.preventDefault()
+	vs.remove()
+	
+	MULTI.start()
 })
