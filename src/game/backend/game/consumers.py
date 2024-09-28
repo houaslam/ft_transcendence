@@ -77,6 +77,13 @@ class GameConsumer(AsyncWebsocketConsumer):
 			'type': 'coordinates',
 			'data': data
 		}))
+  
+	async def time(self, event):
+		data = event['data']
+		await self.send(text_data=json.dumps({
+			'type': 'time',
+			'data': data
+		}))
  
 	async def disconnect(self, close_code):
 		self.keycode = -1

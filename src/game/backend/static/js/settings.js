@@ -7,7 +7,7 @@ export function customizeFrom(gameSocket){
 	<div id="gameOut">
 	<p class="label">choose game Out</p>
 	<div>
-	<input type="radio" name="gameout" value="time">
+	<input type="radio" name="gameout" value="time" checked>
 	<label for="time">time</label>
 	</div>
 	<div>
@@ -19,8 +19,7 @@ export function customizeFrom(gameSocket){
 	<div>
 	<label for="counts" class="label">select count</label>
 	<select name="counts">
-	<option value="">select </option>
-	<option>10</option>
+	<option>10 </option>
 	<option>15</option>
 	<option>20</option>
 	<option>25</option>

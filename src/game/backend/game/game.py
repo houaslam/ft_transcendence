@@ -49,7 +49,6 @@ class Player(GameObject):
 			target += 0.5
 		self.position[0] += (target - self.position[0]) * 0.1
 
-
 class Ball(GameObject):
 
 	def reset(self):
@@ -111,14 +110,21 @@ class Game():
 		self.otherPlayer.update(self.plane)
 		self.ball.update(self.plane, self.player, self.otherPlayer)
 
-	def is_game_over(self, start_time):
+	async def is_game_over(self, start_time, channel_layer):
 		if (self.settings['gameout'] == 'score'):
 			goal =  int(self.settings['counts'])
 			return self.player.score == goal or self.otherPlayer.score == goal
 
 		if (self.settings['gameout'] == 'time'):
 			goalTime =  int(self.settings['counts'])
-			return time.time() - start_time >= goalTime
+			elapsed = time.time() - start_time
+			await channel_layer.group_send("invite",
+			{
+				'type': 'time',
+				'data': int(elapsed)
+			}
+			)
+			return elapsed >= goalTime
 
 		return False
 
@@ -145,9 +151,12 @@ class Game():
 		if (invited.keycode == -1 or self.player.score > self.otherPlayer.score):
 			hoster.game_result = "W"
 			invited.game_result = "L"
-		else:
+		elif (self.player.score < self.otherPlayer.score):
 			invited.game_result = "W"
 			hoster.game_result = "L"
+		else:
+			invited.game_result = "W"
+			hoster.game_result = "W"
 
 async def startGame(channel_layer, hoster, invited):
 	game = Game(hoster.game.settings)
@@ -176,7 +185,7 @@ async def startGame(channel_layer, hoster, invited):
 		)
 		
 		# GAME OVER CHECK
-		if (game.is_game_over(start)):
+		if (await game.is_game_over(start, channel_layer)):
 			break
 
 		await asyncio.sleep(0.04)
@@ -184,8 +193,7 @@ async def startGame(channel_layer, hoster, invited):
 
 	# SAVE TO DATABASE
 	game.end_game_results(hoster, invited)
-	await sync_to_async(hoster.player.save)()
-	await sync_to_async(invited.player.save)()
+
 
 
 	await hoster.send(text_data=json.dumps({

@@ -2,7 +2,7 @@
 import * as THREE from 'https://cdnjs.cloudflare.com/ajax/libs/three.js/0.167.0/three.module.js'
 import { OrbitControls } from 'https://cdn.skypack.dev/three@0.129.0/examples/jsm/controls/OrbitControls.js';
 import { customizeFrom} from './settings.js'
-import { endgame,  score, updateScore} from './elements.js';
+import { endgame,  score, updateScore, time, updateTime} from './elements.js';
 
 function socketSetup() {
 	let url = `ws://${window.location.host}/ws/game/`
@@ -61,7 +61,6 @@ function gameSetup(scene, camera, renderer) {
 }
 
 export function start() {
-	console.log("AGAIN");
 	
 	let canva = document.getElementById("canva");
 
@@ -100,6 +99,10 @@ export function start() {
 	// ANIMATION 
 	let scorePanel = score(0, 0)
 	canva.append(scorePanel)
+	let timePanel = time(0)
+	canva.append(timePanel)
+	timePanel.style.display= 'none'
+
 	function animation() {
 		gameSocket.onmessage = (e) => {
 
@@ -109,8 +112,6 @@ export function start() {
 			switch (dataType) 
 			{
 				case "coordinates":
-					console.log("COOR", canva.innerHTML);
-					
 					let coordinates = dataJson['data']
 					ball.position.fromArray(coordinates.ball.position)
 					player.position.fromArray(coordinates.player.position)
@@ -119,21 +120,24 @@ export function start() {
 					break;
 				
 				case "endGame" :
-					console.log("END", canva.innerHTML);
 					let pop = endgame(dataJson['state'], dataJson['by']);
 					canva.append(pop)
-
 					pop.style.transform = " translate(-50%, -50%) scale(1) "
 					let backHome = document.getElementById("back")
 					backHome.addEventListener('click', (e) => {
 						window.location.href = '/'
 					})
+					break;
 
 				case 'gameInfo':
-					console.log("FORM", canva.innerHTML);
 					let form = customizeFrom(gameSocket)
 					canva.append(form)
-
+					break;
+				
+				case 'time':
+					timePanel.style.display = 'block'
+					updateTime(timePanel, dataJson['data'])
+					break;
 				default:
 					break;
 			}

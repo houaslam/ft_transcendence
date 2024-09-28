@@ -29,12 +29,30 @@ export function score(firstScore , secondScore){
 }
 
 
+export function time(elapsedTime){
+	let time = document.createElement('div')
+	time.setAttribute('id', 'timePanel')
+	time.innerHTML = `
+		<h1>TIME</h1>
+		<p> ${elapsedTime} second</p>
+	`
+	return time
+}
+
+export function updateTime(html , elapsedTime){
+	html.innerHTML = `
+		<h1>TIME</h1>
+		<p> ${elapsedTime} second</p>
+	`
+	// return time
+}
+
+
 export function updateScore(html, firstScore , secondScore){
 	html.innerHTML = `
 		<h1>SCORE</h1>
 		<p>first Player : ${firstScore}</p>
 		<p>second Player : ${secondScore}</p>
 	`
-	return score
 }
 
