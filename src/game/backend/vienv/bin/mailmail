@@ -1,4 +1,4 @@
-#!/Users/houaslam/Desktop/ft_transcendence/src/backend/srcs/vienv/bin/python3
+#!/Users/houaslam/Desktop/ft_transcendence/src/game/backend/vienv/bin/python3
 # -*- coding: utf-8 -*-
 import re
 import sys

@@ -5,6 +5,7 @@ from asgiref.sync import async_to_sync, sync_to_async
 from channels.db import database_sync_to_async
 from game import models
 from . import game
+# from . import game
 
 players=[]
 
@@ -30,15 +31,15 @@ class GameConsumer(AsyncWebsocketConsumer):
 		}))
 
 		else:
-			print("IS INVITED")
 			self.game = await self.find_game()
 			self.game.player_count += 1
 			await sync_to_async(self.game.save)()
+
 			if (self.game and await self.game_is_ready(self.game) and len(players)  >= 4):
 				print("GAME GONNA START")
 				self.game.gameStatus = 'STARTED'
 				await sync_to_async(self.game.save)()
-					# await self.start_game()
+				await self.start_game()
 
  
 	@database_sync_to_async
@@ -56,6 +57,13 @@ class GameConsumer(AsyncWebsocketConsumer):
 	def create_game(self):
 		return models.Game.objects.create(gameStatus='WAITING', player_count=1)
 
+	@database_sync_to_async
+	def find_game(self):
+		return models.Game.objects.filter(gameStatus='WAITING').first()
+
+	async def start_game(self):
+		consumers = [players.pop() for i in range(4) ]
+		asyncio.create_task(game.startGame(self.channel_layer, consumers))
 
 	async def receive(self, text_data):
 		dataJson = json.loads(text_data)

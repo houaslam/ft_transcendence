@@ -1,7 +1,6 @@
 import * as THREE from 'https://cdnjs.cloudflare.com/ajax/libs/three.js/0.167.0/three.module.js'
 import { OrbitControls } from 'https://cdn.skypack.dev/three@0.129.0/examples/jsm/controls/OrbitControls.js';
-import { customizeFrom} from './settings.js'
-import { endgame,  score, updateScore, time, updateTime} from './elements.js';
+import { endgame,  score, updateScore, time, updateTime, customizeFrom} from './multiElements.js';
 
 
 function gameSetup(scene, camera, renderer) {
@@ -96,6 +95,12 @@ export function start() {
     scene.add(plane);
     scene.add(ball);
 
+    let scorePanel = score(0, 0, 0, 0)
+	canva.append(scorePanel)
+	let timePanel = time(0)
+	canva.append(timePanel)
+	timePanel.style.display= 'none'
+
     function animation() {
         gameSocket.onmessage = function(e) {
             let dataJson = JSON.parse(e.data)
@@ -106,9 +111,15 @@ export function start() {
 				case "coordinates":
 					let coordinates = dataJson['data']
 					ball.position.fromArray(coordinates.ball.position)
-					player.position.fromArray(coordinates.player.position)
-					otherPlayer.position.fromArray(coordinates.otherPlayer.position)
-					updateScore(scorePanel,coordinates.player.score, coordinates.otherPlayer.score)
+                    player1.position.fromArray(coordinates.player1.position)
+                    player2.position.fromArray(coordinates.player2.position)
+                    player3.position.fromArray(coordinates.player3.position)
+                    player4.position.fromArray(coordinates.player4.position)
+
+					updateScore(
+                        scorePanel,
+                        coordinates.player1.score,coordinates.player2.score,
+                        coordinates.player3.score,coordinates.player4.score)
 					break;
 				
 				case "endGame" :
@@ -133,33 +144,6 @@ export function start() {
 				default:
 					break;
 			}
-            if (dataJson['type'] == "coordinates") {
-
-                let coordinates = dataJson['data']
-
-                ball.position.fromArray(coordinates.ball.position)
-                player1.position.fromArray(coordinates.player1.position)
-                player2.position.fromArray(coordinates.player2.position)
-                player3.position.fromArray(coordinates.player3.position)
-                player4.position.fromArray(coordinates.player4.position)
-
-                player1_score.innerHTML = coordinates.player1.score;
-                player2_score.innerHTML = coordinates.player2.score;
-                player3_score.innerHTML = coordinates.player3.score;
-                player4_score.innerHTML = coordinates.player4.score;
-
-
-            } else if (dataJson['type'] == "message") {
-
-                let pop = endgame(dataJson['data']);
-                canva.append(pop)
-                pop.style.transform = " translate(-50%, -50%) scale(1) "
-                let backHome = document.getElementById("back")
-                backHome.addEventListener('click', (e) => {
-                    window.location.href = '/'
-                })
-
-            }
             ball.rotation.x += 0.1
         }
         renderer.render(scene, camera);

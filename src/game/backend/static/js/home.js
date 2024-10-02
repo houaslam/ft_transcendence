@@ -7,13 +7,15 @@ let multi = document.getElementById('MULTI')
 vs.addEventListener('click', (e) =>{
 	e.preventDefault()
 	vs.remove()
+	multi.remove()
 	
 	INVITE.start()
 })
 
 
-vs.addEventListener('click', (e) =>{
+multi.addEventListener('click', (e) =>{
 	e.preventDefault()
+	multi.remove()
 	vs.remove()
 	
 	MULTI.start()

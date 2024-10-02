@@ -110,7 +110,7 @@ class Game():
 		self.otherPlayer.update(self.plane)
 		self.ball.update(self.plane, self.player, self.otherPlayer)
 
-	async def is_game_over(self, start_time, channel_layer, hoster, invited):
+	async def is_game_over(self, start_time, channel_layer):
 		if (self.settings['gameout'] == 'score'):
 			goal =  int(self.settings['counts'])
 			return self.player.score == goal or self.otherPlayer.score == goal
@@ -187,7 +187,7 @@ async def startGame(channel_layer, hoster, invited):
 		)
 		
 		# GAME OVER CHECK
-		if (await game.is_game_over(start, channel_layer, hoster, invited)):
+		if (await game.is_game_over(start, channel_layer)):
 			break
 
 		await asyncio.sleep(0.04)
