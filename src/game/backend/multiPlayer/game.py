@@ -61,13 +61,40 @@ class Player(GameObject):
 
 class Ball(GameObject):
 
-	def reset(self):
+	def reset(self, players, plane):
+
+		for i in range(4):
+			if (i < 2 and self.back > plane.back):
+				if (self.position[0] > plane.position[0]):
+					for player in players :
+						player.score += 1 
+					players[0].score -= 1
+					break
+				else:
+					for player in players :
+						player.score += 1 
+					players[1].score -= 1
+					break
+
+			else:
+				if (self.position[0] > plane.position[0]):
+					for player in players :
+						player.score += 1 
+					players[2].score -= 1
+					break
+
+				else:
+					for player in players :
+						player.score += 1 
+					players[3].score -= 1
+					break
+
 		self.position = [0, 0.8, 0]
 		self.velocity = [random.uniform(-0.1, 0.1), 0.01, 0.05]
 
+
 	def is_out_of_bound(self, plane):
 			return (self.front < plane.front or self.back > plane.back)
-
 
 	def update(self, plane, players):
 		self.updateBounds()
@@ -80,7 +107,7 @@ class Ball(GameObject):
 			self.velocity[0] *= -1
 		
 		if (self.is_out_of_bound(plane)):
-			self.reset()
+			self.reset(players, plane)
 			return
 
 		for i in range(len(players)):
@@ -119,6 +146,8 @@ class Game():
 
 		self.settings = settings
 		self.players = [self.player1, self.player2,self.player3, self.player4]
+		self.goalTime =  int(self.settings['counts'])
+		
 		
 	def update(self):
 		self.player1.update(self.plane)
@@ -166,47 +195,35 @@ class Game():
 			consumers[i].keycode = 0
 		return "endgame", True
 
-    def score(self):
-		for i in range(4):
-			if ( self.ball.front < self.plane.front or self.ball.back > self.plane.back ):
-				if (i% 2 == 0):
-					if (self.ball.position[0] > self.plane.position[0]):
-						players[]
-					else:
-						print("2")
-				else:
-					if (self.ball.position[0] > self.plane.position[0]):
-						print("3")
-					else:
-						print("4")
-      
 
 	async def is_game_over(self, start_time, channel_layer):
 		if (self.settings['gameout'] == 'score'):
-			goal =  int(self.settings['counts'])
-			return self.player1.score == goal or self.player2.score == goal or self.player3.score == goal or self.player4.score == goal
+			return all(player.score == goal for player in self.players)
 
 		if (self.settings['gameout'] == 'time'):
-			goalTime =  int(self.settings['counts'])
 			elapsed = time.time() - start_time
-			await channel_layer.group_send("invite",
-			{
-				'type': 'time',
-				'data': int(elapsed)
-			}
+			await channel_layer.group_send("test",
+				{
+					'type': 'time',
+					'data': int(elapsed)
+				}
 			)
-			# if (elapsed >= goalTime and self.player.score == self.otherPlayer.score):
-			# 	goalTime +=  5
-			return elapsed >= goalTime
+			if (elapsed >= self.goalTime and all(player.score == self.players[0].score for player in self.players)):
+				self.goalTime +=  5
+			return elapsed >= self.goalTime
 
 		return False
 
 	async def end_game_results(self, consumers, message):
-		# result = sorted(consumers, key= lambda x: x.score);
+		winner = max(self.players, key=lambda x: x.score)
+		index = self.players.index(winner)
 		for i in range(4):
+			state = 'L'
+			if (i == index):
+				state = 'W'
 			await consumers[i].send(text_data=json.dumps({
 			'type' : 'endGame',
-			'state' : i,
+			'state' : state,
 			'by' : message
 		}))
 
@@ -234,7 +251,7 @@ async def startGame(channel_layer, consumers):
 		)
 	
 		# GAME OVER CHECK
-		game.score()
+		# game.score()
 		if (await game.is_game_over(start, channel_layer)):
     			break
 		await asyncio.sleep(0.04)
