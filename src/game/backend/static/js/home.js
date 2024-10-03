@@ -34,7 +34,7 @@ multi.addEventListener('click', (e) => {
 })
 
 
-multi.addEventListener('click', (e) => {
+tour.addEventListener('click', (e) => {
     e.preventDefault()
     vs.remove()
     multi.remove()
@@ -42,10 +42,10 @@ multi.addEventListener('click', (e) => {
     tour.remove()
     rps.remove()
 
-    MULTI.start()
+    TOUR.start()
 })
 
-multi.addEventListener('click', (e) => {
+rps.addEventListener('click', (e) => {
     e.preventDefault()
     vs.remove()
     multi.remove()
@@ -53,10 +53,10 @@ multi.addEventListener('click', (e) => {
     tour.remove()
     rps.remove()
 
-    MULTI.start()
+    RPS.start()
 })
 
-multi.addEventListener('click', (e) => {
+local.addEventListener('click', (e) => {
     e.preventDefault()
     vs.remove()
     multi.remove()
@@ -64,5 +64,5 @@ multi.addEventListener('click', (e) => {
     tour.remove()
     rps.remove()
 
-    MULTI.start()
+    LOCAL.start()
 })

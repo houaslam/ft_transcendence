@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game</title>
+    <style>
+        * {
+            padding: 0px;
+            margin: 0px;
+            overflow: hidden;
+        }
+        
+        .match_popup {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgb(189, 189, 189);
+            border-radius: 5px;
+            display: flex;
+            flex-direction: column;
+            /* gap: 1rem; */
+            padding: 1rem 2rem;
+        }
+        
+        .match_popup li {
+            color: aquamarine;
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <main id="canva">
+
+        <div class="match_popup">
+            <div class="">
+                <p>waiting for others</p>
+            </div>
+            <ul class="user_list">
+                <li>USER 1</li>
+                <li>USER 3</li>
+                <li>USER 2</li>
+                <li>USER 4</li>
+            </ul>
+        </div>
+    </main>
+
+
+
+</body>
+
+</html>

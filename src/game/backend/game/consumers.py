@@ -84,7 +84,25 @@ class GameConsumer(AsyncWebsocketConsumer):
 			'type': 'time',
 			'data': data
 		}))
- 
+
+	async def discard(self, event):
+		data = event['data']
+		await self.send(text_data=json.dumps({
+			'type': 'discard',
+			'data': data
+		}))
+	
+
 	async def disconnect(self, close_code):
-		self.keycode = -1
+		self.keycode =  -1
+		players.remove(self)
+		await self.channel_layer.group_discard("invite", self.channel_name)
+		if (self.is_host):
+			await sync_to_async(self.game.delete)()
+			await self.channel_layer.group_send("invite",
+			{
+				'type': 'discard',
+				'data': 'discard'
+			}
+		)
 		print("BYE BYE : ", close_code)

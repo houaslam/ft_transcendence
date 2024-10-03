@@ -1,6 +1,6 @@
 import * as THREE from 'https://cdnjs.cloudflare.com/ajax/libs/three.js/0.167.0/three.module.js'
 import { OrbitControls } from 'https://cdn.skypack.dev/three@0.129.0/examples/jsm/controls/OrbitControls.js';
-import { endgame, score, updateScore, time, updateTime, customizeFrom } from './multiElements.js';
+import { endgame, score, updateScore, time, updateTime, customizeFrom, match_making, update_match_making } from './multiElements.js';
 
 
 function gameSetup(scene, camera, renderer) {
@@ -100,6 +100,8 @@ export function start() {
     let timePanel = time(0)
     canva.append(timePanel)
     timePanel.style.display = 'none'
+    let matchMaking = match_making()
+    canva.append(matchMaking)
 
     function animation() {
         gameSocket.onmessage = function(e) {
@@ -108,6 +110,7 @@ export function start() {
 
             switch (dataType) {
                 case "coordinates":
+                    matchMaking.style.transform = " translate(-50%, -50%) scale(0) "
                     let coordinates = dataJson['data']
                     ball.position.fromArray(coordinates.ball.position)
                     player1.position.fromArray(coordinates.player1.position)
@@ -137,10 +140,14 @@ export function start() {
                     break;
 
                 case 'time':
-                    console.log("HERERERERE")
                     timePanel.style.display = 'block'
                     updateTime(timePanel, dataJson['data'])
                     break;
+                case 'match_making':
+                    console.log("MAATCH")
+                    matchMaking.style.transform = " translate(-50%, -50%) scale(1) "
+                    update_match_making(dataJson['data'])
+                    break
                 default:
                     break;
             }

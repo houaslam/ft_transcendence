@@ -61,6 +61,40 @@ export function endgame(state, by) {
     return pop
 }
 
+export function discard(state, by) {
+    let pop = document.createElement('div')
+    pop.setAttribute('id', 'popup')
+
+    let real_state = ""
+    if (state == "W")
+        real_state = "WON"
+    else
+        real_state = "LOST"
+    pop.innerHTML = `
+            <h4>YOU ${real_state}</h4>
+            <p>by ${by}</p>
+            <button id="back">BACK HOME</button>
+        `
+    return pop
+}
+
+export function match_making() {
+    let pop = document.createElement('div')
+    pop.setAttribute('id', 'match_popup')
+
+    pop.innerHTML = `
+        <div>
+            <div class="">
+                <p>waiting for others</p>
+            </div>
+            <ul id="user_list">
+
+            </ul>
+        </div>
+        `
+    return pop
+}
+
 export function score(firstScore, secondScore, thirdScore, fourthScore) {
     let score = document.createElement('div')
     score.setAttribute('id', 'scorePanel')
@@ -102,4 +136,14 @@ export function updateScore(html, firstScore, secondScore, thirdScore, fourthSco
 		<p style="color: #22ffff"> ${thirdScore}</p>
 		<p style="color: #ff9900"> ${fourthScore}</p>
 	`
+}
+
+export function update_match_making(usernames) {
+    document.getElementById('user_list').innerHTML = ''
+    for (let i = 0; i < usernames.length; i++) {
+        let node = document.createElement("li");
+        let textnode = document.createTextNode(usernames[i]);
+        node.appendChild(textnode);
+        document.getElementById('user_list').appendChild(node)
+    }
 }

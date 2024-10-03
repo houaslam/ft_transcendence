@@ -27,7 +27,6 @@ class GameObject():
 		self.left = self.position[0] - self.dimension[0] / 2
 		self.right = self.position[0] + self.dimension[0] / 2
 
-
 class Plane(GameObject):
 	pass
 
@@ -57,7 +56,6 @@ class Player(GameObject):
 			elif (i%2 != 0 and self.right <= plane.position[0]):
 				target += 0.5
 		self.position[0] += (target - self.position[0]) * 0.5
-
 
 class Ball(GameObject):
 
@@ -196,13 +194,14 @@ class Game():
 		return "endgame", True
 
 
-	async def is_game_over(self, start_time, channel_layer):
+	async def is_game_over(self, start_time, channel_layer, game_group_name):
 		if (self.settings['gameout'] == 'score'):
+			goal = int(self.settings['count'])
 			return all(player.score == goal for player in self.players)
 
 		if (self.settings['gameout'] == 'time'):
 			elapsed = time.time() - start_time
-			await channel_layer.group_send("test",
+			await channel_layer.group_send(game_group_name,
 				{
 					'type': 'time',
 					'data': int(elapsed)
@@ -228,7 +227,7 @@ class Game():
 		}))
 
 
-async def startGame(channel_layer, consumers):
+async def startGame(game_group_name , channel_layer, consumers):
 	game = Game(consumers[0].game.settings)
 	start = time.time()
 	message = 'endGame'
@@ -243,7 +242,7 @@ async def startGame(channel_layer, consumers):
 			break
 
 		# SEND TO FRONT
-		await channel_layer.group_send("test",
+		await channel_layer.group_send(game_group_name,
 			{
 				'type': 'coordinates',
 				'data': game.get_coordinates()
@@ -252,27 +251,9 @@ async def startGame(channel_layer, consumers):
 	
 		# GAME OVER CHECK
 		# game.score()
-		if (await game.is_game_over(start, channel_layer)):
-    			break
+		if (await game.is_game_over(start, channel_layer, game_group_name)):
+				break
 		await asyncio.sleep(0.04)
 
 	print("GAME ENDED")
 	await game.end_game_results(consumers, message)
-
-	# await channel_layer.group_send("test",
-	# 		{
-	# 			'type': 'message',
-	# 			'data': message
-	# 		}
-	# )
-	# winner = max(player , key x: x.score)
-	# SAVE TO DATABASE
-	# if (player1.score > player2.score):
-	# 	first.match.gameStatus = "W"
-	# 	second.match.gameStatus = "L"
-	# else:
-	# 	second.match.gameStatus = "W"
-	# 	first.match.gameStatus = "L"
-
-	# await sync_to_async(first.match.save)()
-	# await sync_to_async(second.match.save)()
