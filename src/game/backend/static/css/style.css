@@ -7,7 +7,11 @@
 body {
     width: 100%;
     height: 100vh;
+    background-color: rgb(0, 0, 0);
 }
+
+
+/* GAME CUSTOM FORM */
 
 #custom-form {
     position: fixed;
@@ -39,6 +43,9 @@ body {
     background-color: #45a049;
 }
 
+
+/* END GAME POP UP */
+
 #popup {
     position: fixed;
     top: 50%;
@@ -66,11 +73,11 @@ body {
     background-color: rgb(189, 189, 189);
 }
 
-#scorePanel {
-    z-index: 10;
-    position: fixed;
-    color: white;
-}
+
+/* SCORE */
+
+
+/* TIME */
 
 #timePanel {
     z-index: 10;
@@ -78,6 +85,9 @@ body {
     left: 70%;
     color: white;
 }
+
+
+/* MATCH MAKING POP UP */
 
 #match_popup {
     z-index: 10;
@@ -131,4 +141,56 @@ body {
     height: 30px;
     border-radius: 50%;
     object-fit: cover;
+}
+
+
+/* GAME INFO */
+
+#scorePanel {
+    z-index: 10;
+    position: sticky;
+    left: 50%;
+    transform: translate(-50%, 0%);
+}
+
+.players {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 2rem;
+    color: white;
+    align-items: center;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.player {
+    background-color: rgba(146, 127, 192, 0.389);
+    width: 200px;
+    border-radius: 50px;
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    padding: .5rem 1rem;
+}
+
+.profile-pic {
+    width: 50px;
+    border-radius: 50%;
+    border: 1px solid black;
+}
+
+.score {
+    position: sticky;
+    display: flex;
+    justify-content: space-around;
+    margin-top: 2rem;
+    color: white;
+    align-items: center;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.player-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
 }
