@@ -145,7 +145,6 @@ export function start() {
                     updateTime(timePanel, dataJson['data'])
                     break;
                 case 'match_making':
-                    console.log("MAATCH")
                     matchMaking.style.transform = " translate(-50%, -50%) scale(1) "
                     update_match_making(dataJson['data'])
                     break

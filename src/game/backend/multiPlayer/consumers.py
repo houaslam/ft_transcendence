@@ -45,8 +45,11 @@ class GameConsumer(AsyncWebsocketConsumer):
 			await sync_to_async(self.game.save)()
 			if (self.game and await self.game_is_ready(self.game) and len(players)  >= 4):
 				print("GAME GONNA START")
-				self.game.gameStatus = 'STARTED'
-				await sync_to_async(self.game.save)()
+
+				#  CHECK THIS ONE
+				for player in players:
+					player.game.gameStatus = 'STARTED'
+					await sync_to_async(player.game.save)()
 				await self.start_game()
 
  

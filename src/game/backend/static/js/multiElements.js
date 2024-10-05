@@ -139,7 +139,6 @@ export function updateScore(html, firstScore, secondScore, thirdScore, fourthSco
 }
 
 export function update_match_making(usernames) {
-    console.log("USERS = ", usernames)
     document.getElementById('user_list').innerHTML = ''
     for (let i = 0; i < usernames.length; i++) {
         let node = document.createElement("li");
