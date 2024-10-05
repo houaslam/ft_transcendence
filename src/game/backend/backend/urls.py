@@ -22,5 +22,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include( "backendApp.urls" ) ),
     path('ws/game/', include( "game.urls" ) ),
-    path('ws/multi/', include( "multiPlayer.urls" ) )
+    path('ws/multi/', include( "multiPlayer.urls" ) ),
+    path('ws/tourn/', include( "tournament.urls" ) )
 ]

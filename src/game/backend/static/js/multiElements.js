@@ -54,10 +54,10 @@ export function endgame(state, by) {
     else
         real_state = "LOST"
     pop.innerHTML = `
-            <h4>YOU ${real_state}</h4>
-            <p>by ${by}</p>
-            <button id="back">BACK HOME</button>
-        `
+			<h4>YOU ${real_state}</h4>
+			<p>by ${by}</p>
+			<button id="back">BACK HOME</button>
+		`
     return pop
 }
 
@@ -71,10 +71,10 @@ export function discard(state, by) {
     else
         real_state = "LOST"
     pop.innerHTML = `
-            <h4>YOU ${real_state}</h4>
-            <p>by ${by}</p>
-            <button id="back">BACK HOME</button>
-        `
+			<h4>YOU ${real_state}</h4>
+			<p>by ${by}</p>
+			<button id="back">BACK HOME</button>
+		`
     return pop
 }
 
@@ -83,15 +83,15 @@ export function match_making() {
     pop.setAttribute('id', 'match_popup')
 
     pop.innerHTML = `
-        <div>
-            <div class="">
-                <p>waiting for others</p>
-            </div>
-            <ul id="user_list">
+		<div>
+			<div class="">
+				<p>waiting for others</p>
+			</div>
+			<ul id="user_list">
 
-            </ul>
-        </div>
-        `
+			</ul>
+		</div>
+		`
     return pop
 }
 
@@ -139,6 +139,7 @@ export function updateScore(html, firstScore, secondScore, thirdScore, fourthSco
 }
 
 export function update_match_making(usernames) {
+    console.log("USERS = ", usernames)
     document.getElementById('user_list').innerHTML = ''
     for (let i = 0; i < usernames.length; i++) {
         let node = document.createElement("li");
@@ -146,4 +147,5 @@ export function update_match_making(usernames) {
         node.appendChild(textnode);
         document.getElementById('user_list').appendChild(node)
     }
+
 }

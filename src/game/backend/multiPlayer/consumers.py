@@ -7,12 +7,13 @@ from game import models
 from . import game
 # from . import game
 
-players=[]
 
+players=[]
 class GameConsumer(AsyncWebsocketConsumer):
 	gameOption = {}
 	async def connect(self):
 		# # INTERNAL CONNECTION
+		players.append(self)
 		print("NEW CONNECTION")
 		await self.accept()
 
@@ -22,7 +23,6 @@ class GameConsumer(AsyncWebsocketConsumer):
 
 		# # PLAYER CREATION
 		self.keycode= 0
-		players.append(self)
 
 		# # GAME LAUNCH
 		self.is_host = await self.is_host()
@@ -124,19 +124,20 @@ class GameConsumer(AsyncWebsocketConsumer):
 
 	async def disconnect(self, close_code):
 		self.keycode =  -1
-		print("LEN PLAYERS = ", len(players))
+		print("STATUS ", self.game.gameStatus)
+		print("GAME = " , self.game)
 		if (self.game.gameStatus == 'WAITING'):
 			players.remove(self)
-		await self.channel_layer.group_send(self.game_group_name,
-				{
-					'type': 'match_making',
-					'data': [player.name for player in players]
-				}
-		)
-		await self.channel_layer.group_discard(self.game_group_name, self.channel_name)
-		if (self.is_host):
-			await sync_to_async(self.game.delete)()
-		else:
-			self.game.player_count -= 1
-			await sync_to_async(self.game.save)()
+			await self.channel_layer.group_send(self.game_group_name,
+					{
+						'type': 'match_making',
+						'data': [player.name for player in players]
+					}
+			)
+			await self.channel_layer.group_discard(self.game_group_name, self.channel_name)
+			if (self.is_host):
+				await sync_to_async(self.game.delete)()
+			else:
+				self.game.player_count -= 1
+				await sync_to_async(self.game.save)()
 		print("BYE BYE : ", close_code)
