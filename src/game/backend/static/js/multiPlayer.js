@@ -1,8 +1,8 @@
-2
 import * as THREE from 'https://cdnjs.cloudflare.com/ajax/libs/three.js/0.167.0/three.module.js'
 import { OrbitControls } from 'https://cdn.skypack.dev/three@0.129.0/examples/jsm/controls/OrbitControls.js';
-import { endgame, score, updateScore, time, updateTime, customizeFrom, match_making, update_match_making } from './multiElements.js';
-import { updateTime, time } from './elements.js';
+import { customizeFrom} from './settings.js'
+// import { endgame,  score, updateScore, time, updateTime} from './elements.js';
+
 
 function gameSetup(scene, camera, renderer) {
     camera.position.z = 5;
@@ -61,7 +61,7 @@ function socketSetup() {
 }
 
 export function start() {
-    let canva = document.getElementById("canva");
+	let canva = document.getElementById("canva");
 
     let gameSocket = socketSetup()
 
@@ -73,19 +73,19 @@ export function start() {
     let ball, player1, player2, player3, player4, plane;
 
     //PLANE
-    plane = new THREE.Mesh(new THREE.BoxGeometry(5, .2, 5), new THREE.MeshLambertMaterial({ color: 0x005599 }))
+    plane = new THREE.Mesh(new THREE.BoxGeometry(5, .2, 5),new THREE.MeshLambertMaterial({ color: 0x005599 }))
 
     // 	BALL
-    ball = new THREE.Mesh(new THREE.SphereGeometry(.2, 32, 15), new THREE.MeshLambertMaterial({ color: 0xffffff }))
+    ball = new THREE.Mesh(new THREE.SphereGeometry(.2, 32, 15),new THREE.MeshLambertMaterial({ color: 0xffffff }))
 
     // PLAYER
-    player1 = new THREE.Mesh(new THREE.BoxGeometry(1, .3, .3), new THREE.MeshLambertMaterial({ color: 0xff99ff }))
+    player1 = new THREE.Mesh(new THREE.BoxGeometry(1, .3, .3),new THREE.MeshLambertMaterial({ color: 0xff99ff }))
 
-    player2 = new THREE.Mesh(new THREE.BoxGeometry(1, .3, .3), new THREE.MeshLambertMaterial({ color: 0xffff88 }))
+    player2 = new THREE.Mesh(new THREE.BoxGeometry(1, .3, .3),new THREE.MeshLambertMaterial({ color: 0xffff88 }))
 
-    player3 = new THREE.Mesh(new THREE.BoxGeometry(1, .3, .3), new THREE.MeshLambertMaterial({ color: 0x22ffff }))
+    player3 = new THREE.Mesh(new THREE.BoxGeometry(1, .3, .3),new THREE.MeshLambertMaterial({ color: 0x22ffff }))
 
-    player4 = new THREE.Mesh(new THREE.BoxGeometry(1, .3, .3), new THREE.MeshLambertMaterial({ color: 0xff9900 }))
+    player4 = new THREE.Mesh(new THREE.BoxGeometry(1, .3, .3),new THREE.MeshLambertMaterial({ color: 0xff9900 }))
 
     // SCENE
 
@@ -96,61 +96,52 @@ export function start() {
     scene.add(plane);
     scene.add(ball);
 
-    let scorePanel = score(0, 0, 0, 0)
-    canva.append(scorePanel)
-    let timePanel = time(0)
-    canva.append(timePanel)
-    timePanel.style.display = 'none'
-    let matchMaking = match_making()
-    canva.append(matchMaking)
-
     function animation() {
         gameSocket.onmessage = function(e) {
             let dataJson = JSON.parse(e.data)
-            let dataType = dataJson['type']
-
-            switch (dataType) {
-                case "coordinates":
-                    matchMaking.style.transform = " translate(-50%, -50%) scale(0) "
-                    let coordinates = dataJson['data']
+			let dataType = dataJson['type']
+            
+            switch (dataType) 
+			{
+				case "coordinates":
+					let coordinates = dataJson['data']
+					
                     ball.position.fromArray(coordinates.ball.position)
                     player1.position.fromArray(coordinates.player1.position)
                     player2.position.fromArray(coordinates.player2.position)
                     player3.position.fromArray(coordinates.player3.position)
                     player4.position.fromArray(coordinates.player4.position)
+    
+                    player1_score.innerHTML = coordinates.player1.score;
+                    player2_score.innerHTML = coordinates.player2.score;
+                    player3_score.innerHTML = coordinates.player3.score;
+                    player4_score.innerHTML = coordinates.player4.score;
+    
+                    updateScore(scorePanel,coordinates.player.score, coordinates.otherPlayer.score)
+					break;
+				
+				case "endGame" :
+					let pop = endgame(dataJson['state'], dataJson['by']);
+					canva.append(pop)
+					pop.style.transform = " translate(-50%, -50%) scale(1) "
+					let backHome = document.getElementById("back")
+					backHome.addEventListener('click', (e) => {
+						window.location.href = '/'
+					})
+					break;
 
-                    updateScore(
-                        scorePanel,
-                        coordinates.player1.score, coordinates.player2.score,
-                        coordinates.player3.score, coordinates.player4.score)
-                    break;
-
-                case "endGame":
-                    let pop = endgame(dataJson['state'], dataJson['by']);
-                    canva.append(pop)
-                    pop.style.transform = " translate(-50%, -50%) scale(1) "
-                    let backHome = document.getElementById("back")
-                    backHome.addEventListener('click', (e) => {
-                        window.location.href = '/'
-                    })
-                    break;
-
-                case 'gameInfo':
-                    let form = customizeFrom(gameSocket)
-                    canva.append(form)
-                    break;
-
-                case 'time':
-                    timePanel.style.display = 'flex'
-                    updateTime(dataJson['data'])
-                    break;
-                case 'match_making':
-                    matchMaking.style.transform = " translate(-50%, -50%) scale(1) "
-                    update_match_making(dataJson['data'])
-                    break
-                default:
-                    break;
-            }
+				case 'gameInfo':
+					let form = customizeFrom(gameSocket)
+					canva.append(form)
+					break;
+				
+				case 'time':
+					timePanel.style.display = 'block'
+					updateTime(timePanel, dataJson['data'])
+					break;
+				default:
+					break;
+			}
             ball.rotation.x += 0.1
         }
         renderer.render(scene, camera);

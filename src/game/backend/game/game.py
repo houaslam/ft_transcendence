@@ -104,6 +104,8 @@ class Game():
 		self.player = Player([0,.4,self.plane.dimension[2]/2 - .3], [0,-.1,.05], [1,.3,.3])
 		self.otherPlayer = Player([0,.4,-self.plane.dimension[2]/2 + .3], [0,-.1,.05], [1,.3,.3])
 		self.settings = settings
+		self.goalTime =  int(self.settings['counts'])
+  
 
 	def update(self):
 		self.player.update(self.plane)
@@ -116,7 +118,6 @@ class Game():
 			return self.player.score == goal or self.otherPlayer.score == goal
 
 		if (self.settings['gameout'] == 'time'):
-			goalTime =  int(self.settings['counts'])
 			elapsed = time.time() - start_time
 			await channel_layer.group_send("invite",
 			{
@@ -124,9 +125,9 @@ class Game():
 				'data': int(elapsed)
 			}
 			)
-			if (elapsed >= goalTime and self.player.score == self.otherPlayer.score):
-				goalTime +=  5
-			return elapsed >= goalTime
+			if (elapsed >= self.goalTime and self.player.score == self.otherPlayer.score):
+				self.goalTime +=  5
+			return elapsed >= self.goalTime
 
 		return False
 
@@ -156,9 +157,6 @@ class Game():
 		elif (self.player.score < self.otherPlayer.score):
 			invited.game_result = "W"
 			hoster.game_result = "L"
-		else:
-			invited.game_result = "W"
-			hoster.game_result = "W"
 
 async def startGame(channel_layer, hoster, invited):
 	game = Game(hoster.game.settings)
@@ -200,11 +198,18 @@ async def startGame(channel_layer, hoster, invited):
 
 	await hoster.send(text_data=json.dumps({
 		'type' : 'endGame',
-		'state' : hoster.game_result,
-		'by' : message
+		'data' :{
+      		'state' : hoster.game_result,
+			'by' : message
+      	} 
 	}))
+	print("HOSTER = ", hoster.game_result)
+	print("INVITED = ", invited.game_result)
+
 	await invited.send(text_data=json.dumps({
 		'type' : 'endGame',
-		'state' : invited.game_result,
-		'by' : message,
+		'data' :{
+      		'state' : invited.game_result,
+			'by' : message
+      	} 
 	}))

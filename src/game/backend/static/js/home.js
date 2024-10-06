@@ -18,7 +18,7 @@ vs.addEventListener('click', (e) => {
     tour.remove()
     rps.remove()
 
-    INVITE.start()
+    INVITE.start('game')
 })
 
 
@@ -30,7 +30,7 @@ multi.addEventListener('click', (e) => {
     tour.remove()
     rps.remove()
 
-    MULTI.start()
+    INVITE.start('multi')
 })
 
 

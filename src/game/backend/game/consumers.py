@@ -9,9 +9,9 @@ from . import models,  game
 players=[]
 
 class GameConsumer(AsyncWebsocketConsumer):
-	gameOption = {}
+	gameOption = {}	
 	async def connect(self):
-		print("NEW CONNECTION")
+		print("GAME NEW CONNECTION")
 		await self.accept()
 		await self.channel_layer.group_add("invite",self.channel_name)
 
@@ -96,9 +96,9 @@ class GameConsumer(AsyncWebsocketConsumer):
 
 	async def disconnect(self, close_code):
 		self.keycode =  -1
-		if (self.game.gameStatus == 'WAITING'):
+		if (self.game and self.game.gameStatus == 'WAITING'):
 			players.remove(self)
-			await self.channel_layer.group_discard(self.game_group_name, self.channel_name)
+			await self.channel_layer.group_discard('invite', self.channel_name)
 			if (self.is_host):
 				await sync_to_async(self.game.delete)()
 			else:

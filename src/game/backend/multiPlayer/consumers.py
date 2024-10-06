@@ -12,7 +12,6 @@ players=[]
 class GameConsumer(AsyncWebsocketConsumer):
 	gameOption = {}
 	async def connect(self):
-		# # INTERNAL CONNECTION
 		players.append(self)
 		print("NEW MULLTI CONNECTION")
 		await self.accept()
@@ -23,6 +22,8 @@ class GameConsumer(AsyncWebsocketConsumer):
 
 		# # PLAYER CREATION
 		self.keycode= 0
+		players.append(self)
+  
 
 		# # GAME LAUNCH
 		self.is_host = await self.is_host()
@@ -34,6 +35,7 @@ class GameConsumer(AsyncWebsocketConsumer):
 		}))
 
 		else:
+			print("IS INVITED")
 			await self.channel_layer.group_send(self.game_group_name,
 				{
 					'type': 'match_making',
