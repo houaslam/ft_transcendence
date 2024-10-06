@@ -13,32 +13,41 @@
 
 <body>
 
-    <header id="canva">
+    <div class="wrapper">
 
-        <div class="players">
-
-            <div class="player-info">
-                <div class="player">
-                    <img src="./image.png" alt="player-profile" class="profile-pic">
-                    <p>hajar Ouaslam</p>
-                </div>
-                <h1>2</h1>
+        <div class="container">
+            <div class="circular-progress">
+                <span class="progress-value">0 second</span>
             </div>
+        </div>
+    </div>
+    <!-- JavaScript -->
+    <script>
+        let circularProgress = document.querySelector(".circular-progress"),
+            progressValue = document.querySelector(".progress-value");
 
-            <h1>VS</h1>
+        let progressStartValue = 0,
+            progressEndValue = 10,
+            speed = 100;
 
-            <div class="player-info">
-                <div class="player">
-                    <img src="./image.png" alt="player-profile" class="profile-pic">
-                    <p>kaouthar kouaz</p>
-                </div>
-                <h1>4</h1>
-            </div>
+        let progress = setInterval(() => {
+            progressStartValue++;
 
-    </header>
+            // Calculate the percentage of progress
+            let progressPercentage = (progressStartValue / progressEndValue) * 100;
 
+            // Update the text
+            progressValue.textContent = `${progressStartValue} s`;
 
+            // Update the background - now using progressPercentage to determine the angle
+            circularProgress.style.background = `conic-gradient(#7d2ae8 ${progressPercentage * 3.6}deg, #ededed 0deg)`;
 
+            if (progressStartValue >= progressEndValue) {
+                clearInterval(progress);
+            }
+        }, speed);
+    </script>
 </body>
+
 
 </html>

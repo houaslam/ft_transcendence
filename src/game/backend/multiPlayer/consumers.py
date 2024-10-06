@@ -14,7 +14,7 @@ class GameConsumer(AsyncWebsocketConsumer):
 	async def connect(self):
 		# # INTERNAL CONNECTION
 		players.append(self)
-		print("NEW CONNECTION")
+		print("NEW MULLTI CONNECTION")
 		await self.accept()
 
 		self.name = f"user{random.randint(1, 3)}"
@@ -127,8 +127,6 @@ class GameConsumer(AsyncWebsocketConsumer):
 
 	async def disconnect(self, close_code):
 		self.keycode =  -1
-		print("STATUS ", self.game.gameStatus)
-		print("GAME = " , self.game)
 		if (self.game.gameStatus == 'WAITING'):
 			players.remove(self)
 			await self.channel_layer.group_send(self.game_group_name,

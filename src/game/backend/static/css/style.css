@@ -2,6 +2,7 @@
     padding: 0px;
     margin: 0px;
     overflow: hidden;
+    box-sizing: border-box;
 }
 
 body {
@@ -149,11 +150,11 @@ body {
 #scorePanel {
     z-index: 10;
     position: sticky;
-    left: 50%;
-    transform: translate(-50%, 0%);
+    /* left: 50%; */
+    /* transform: translate(-50%, 0%); */
 }
 
-.players {
+#players {
     display: flex;
     justify-content: space-around;
     margin-top: 2rem;
@@ -193,4 +194,53 @@ body {
     flex-direction: column;
     align-items: center;
     gap: 2rem;
+}
+
+
+/* TIME */
+
+#scorePanel {
+    z-index: 10;
+    display: flex;
+    height: 100vh;
+    align-items: center;
+    justify-content: center;
+    background: black;
+}
+
+.container {
+    display: flex;
+    width: 210px;
+    padding: 25px 0;
+    border-radius: 4px;
+    row-gap: 15px;
+    flex-direction: column;
+    align-items: center;
+}
+
+.circular-progress {
+    position: relative;
+    height: 125px;
+    width: 125px;
+    border-radius: 50%;
+    background: conic-gradient(#7d2ae8 3.6deg, black 0deg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.circular-progress::before {
+    content: "";
+    position: absolute;
+    height: 105px;
+    width: 105px;
+    border-radius: 50%;
+    background-color: black;
+}
+
+.progress-value {
+    position: relative;
+    font-size: 20px;
+    font-weight: 300;
+    color: #7d2ae8;
 }

@@ -33,7 +33,8 @@ class GameConsumer(AsyncWebsocketConsumer):
 			self.game.player_count += 1
 			await sync_to_async(self.game.save)()
 			if (self.game and await self.game_is_ready(self.game) and len(players)  >= 2):
-					self.game.gameStatus = 'STARTED'
+					for player in players:
+						player.game.gameStatus = 'STARTED'
 					await sync_to_async(self.game.save)()
 					await self.start_game()
 
@@ -95,14 +96,12 @@ class GameConsumer(AsyncWebsocketConsumer):
 
 	async def disconnect(self, close_code):
 		self.keycode =  -1
-		players.remove(self)
-		await self.channel_layer.group_discard("invite", self.channel_name)
-		if (self.is_host):
-			await sync_to_async(self.game.delete)()
-			await self.channel_layer.group_send("invite",
-			{
-				'type': 'discard',
-				'data': 'discard'
-			}
-		)
+		if (self.game.gameStatus == 'WAITING'):
+			players.remove(self)
+			await self.channel_layer.group_discard(self.game_group_name, self.channel_name)
+			if (self.is_host):
+				await sync_to_async(self.game.delete)()
+			else:
+				self.game.player_count -= 1
+				await sync_to_async(self.game.save)()
 		print("BYE BYE : ", close_code)

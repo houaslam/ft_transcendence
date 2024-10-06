@@ -115,7 +115,7 @@ export function start() {
                     ball.position.fromArray(coordinates.ball.position)
                     player.position.fromArray(coordinates.player.position)
                     otherPlayer.position.fromArray(coordinates.otherPlayer.position)
-                    scorePanel.style.display = 'block'
+                    scorePanel.style.display = 'flex'
                     updateScore(scorePanel, coordinates.player.score, coordinates.otherPlayer.score)
                     break;
 
@@ -134,10 +134,10 @@ export function start() {
                     canva.append(form)
                     break;
 
-                    // case 'time':
-                    // 	timePanel.style.display = 'block'
-                    // 	updateTime(timePanel, dataJson['data'])
-                    // 	break;
+                case 'time':
+                    timePanel.style.display = 'flex'
+                    updateTime(dataJson['data'])
+                    break;
                 default:
                     break;
             }
