@@ -13,39 +13,30 @@
 
 <body>
 
-    <div class="wrapper">
+    <form id="tournam-regist">
+        <div class="player-set">
 
-        <div class="container">
-            <div class="circular-progress">
-                <span class="progress-value">0 second</span>
-            </div>
+            <input name="player1" class="player-name">
+            <p>VS</p>
+            <input name="player2" class="player-name">
         </div>
-    </div>
-    <!-- JavaScript -->
+        <div class="player-set">
+            <input name="player3" class="player-name">
+            <p>VS</p>
+            <input name="player4" class="player-name">
+        </div>
+
+        <button id="start" type="submit">Start</button>
+
+    </form>
     <script>
-        let circularProgress = document.querySelector(".circular-progress"),
-            progressValue = document.querySelector(".progress-value");
-
-        let progressStartValue = 0,
-            progressEndValue = 10,
-            speed = 100;
-
-        let progress = setInterval(() => {
-            progressStartValue++;
-
-            // Calculate the percentage of progress
-            let progressPercentage = (progressStartValue / progressEndValue) * 100;
-
-            // Update the text
-            progressValue.textContent = `${progressStartValue} s`;
-
-            // Update the background - now using progressPercentage to determine the angle
-            circularProgress.style.background = `conic-gradient(#7d2ae8 ${progressPercentage * 3.6}deg, #ededed 0deg)`;
-
-            if (progressStartValue >= progressEndValue) {
-                clearInterval(progress);
-            }
-        }, speed);
+        form = document.getElementById("tournam-regist")
+        form.addEventListener('submit', (e) => {
+            e.preventDefault()
+            let data = new FormData(form);
+            let gameOptions = Object.fromEntries(data)
+            form.remove()
+        })
     </script>
 </body>
 
