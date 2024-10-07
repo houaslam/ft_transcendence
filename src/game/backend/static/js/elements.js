@@ -162,14 +162,14 @@ export function updateScore( gameObjects, data, mode) {
 
         <div class="player-info">
             <div class="player">
-                <p>kaouthar kouaz</p>
+                <p>ferdaous adermouch</p>
             </div>
             <h1>${data.player3.score}</h1>
         </div>
 
         <div class="player-info">
             <div class="player">
-                <p>kaouthar kouaz</p>
+                <p>houda obenabad</p>
             </div>
             <h1>${data.player4.score}</h1>
         </div>
