@@ -45,7 +45,7 @@ class Player(GameObject):
 	def move(self, keycode, plane, i):
 		target = self.position[0]
 		if (keycode == 37 ):
-			if (i % 2 == 0 and self.left >= plane.position[0]):
+			if (i % 2 == 0 and self.left - 0.5 >= plane.position[0]):
 				target -= 0.5
 			elif (i%2 != 0 and self.left > - plane.dimension[0] / 2):
 				target -= 0.5
@@ -196,8 +196,11 @@ class Game():
 
 	async def is_game_over(self, start_time, channel_layer, game_group_name):
 		if (self.settings['gameout'] == 'score'):
-			goal = int(self.settings['count'])
-			return all(player.score == goal for player in self.players)
+			goal = int(self.settings['counts'])
+			for player in self.players :
+				if (player.score == goal):
+					return True
+			return False
 
 		if (self.settings['gameout'] == 'time'):
 			elapsed = time.time() - start_time
