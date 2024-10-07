@@ -11,10 +11,10 @@ players=[]
 class GameConsumer(AsyncWebsocketConsumer):
 	gameOption = {}	
 	async def connect(self):
-		print("GAME NEW CONNECTION")
 		await self.accept()
+		print("GAME NEW CONNECTION")
 		self.game_group_name = 'invite'
-		await self.channel_layer.group_add("invite",self.channel_name)
+		await self.channel_layer.group_add(self.game_group_name,self.channel_name)
 
 		self.keycode= 0
 		players.append(self)
@@ -36,7 +36,7 @@ class GameConsumer(AsyncWebsocketConsumer):
 			if (self.game and await self.game_is_ready(self.game) and len(players)  >= 2):
 					for player in players:
 						player.game.gameStatus = 'STARTED'
-					await sync_to_async(self.game.save)()
+						await sync_to_async(player.game.save)()
 					await self.start_game()
 
 	@database_sync_to_async
@@ -66,6 +66,7 @@ class GameConsumer(AsyncWebsocketConsumer):
 	async def receive(self, text_data):
 		dataJson = json.loads(text_data)
 		dataType = dataJson['type']
+
 		if (dataType == 'keycode'):
 			self.keycode = dataJson['data']
 		elif (dataType == 'gameSettings' and self.is_host):
@@ -97,7 +98,7 @@ class GameConsumer(AsyncWebsocketConsumer):
 
 	async def disconnect(self, close_code):
 		self.keycode =  -1
-		if (self.game and self.game.gameStatus == 'WAITING'):
+		if (self.game.gameStatus == 'WAITING'):
 			players.remove(self)
 			await self.channel_layer.group_discard('invite', self.channel_name)
 			if (self.is_host):

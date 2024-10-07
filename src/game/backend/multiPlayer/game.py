@@ -224,9 +224,11 @@ class Game():
 			if (i == index):
 				state = 'W'
 			await consumers[i].send(text_data=json.dumps({
-			'type' : 'endGame',
-			'state' : state,
+		'type' : 'endGame',
+		'data' :{
+      		'state' : state,
 			'by' : message
+      	} 
 		}))
 
 

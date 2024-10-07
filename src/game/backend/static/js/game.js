@@ -1,6 +1,6 @@
 import * as THREE from 'https://cdnjs.cloudflare.com/ajax/libs/three.js/0.167.0/three.module.js'
 import { OrbitControls } from 'https://cdn.skypack.dev/three@0.129.0/examples/jsm/controls/OrbitControls.js';
-import { customizeFrom, endgame, score, updateScore, time, updateTime, updateEndGame } from './elements.js';
+import { customizeFrom, match_making, update_match_making, score, updateScore, time, updateTime, updateEndGame } from './elements.js';
 
 
 const PLAYER_GEO = new THREE.BoxGeometry(1, .3, .3)
@@ -66,10 +66,13 @@ function setup_canva() {
     let canva = document.getElementById("canva");
     let scorePanel = score(0, 0)
     let timePanel = time(0)
+    let matchMaking = match_making()
     canva.append(scorePanel)
     canva.append(timePanel)
+    canva.append(matchMaking)
     timePanel.style.display = 'none'
     scorePanel.style.display = 'none'
+        // matchMaking.style.display = 'none'
 
 
 }
@@ -83,6 +86,7 @@ function update_coordinates(gameObjects, coordinates, mode) {
         player.position.fromArray(coordinates.player.position);
         otherPlayer.position.fromArray(coordinates.otherPlayer.position)
     } else if (mode === 'multi') {
+        document.getElementById("match_popup").style.display = 'none'
         const { player1, player2, player3, player4 } = gameObjects;
         player1.position.fromArray(coordinates.player1.position);
         player2.position.fromArray(coordinates.player2.position);
@@ -169,6 +173,7 @@ export function start(mode) {
                     break;
 
                 case "endGame":
+
                     updateEndGame(data)
                     break;
 
@@ -180,6 +185,9 @@ export function start(mode) {
                     timePanel.style.display = 'flex'
                     updateTime(data)
                     break;
+
+                case 'match_making':
+                    update_match_making(data)
                 default:
                     break;
             }

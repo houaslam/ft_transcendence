@@ -12,7 +12,6 @@ players=[]
 class GameConsumer(AsyncWebsocketConsumer):
 	gameOption = {}
 	async def connect(self):
-		players.append(self)
 		print("NEW MULLTI CONNECTION")
 		await self.accept()
 

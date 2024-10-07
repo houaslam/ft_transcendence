@@ -168,10 +168,10 @@ export function endgame(data) {
     else
         real_state = "LOST"
     pop.innerHTML = `
-            <h4>YOU ${real_state}</h4>
-            <p>by ${data.by}</p>
-            <button id="back">BACK HOME</button>
-        `
+    <h4>YOU ${real_state}</h4>
+    <p>by ${data.by}</p>
+    <button id="back">BACK HOME</button>
+    `
     return pop
 }
 
@@ -183,4 +183,33 @@ export function updateEndGame(data) {
     backHome.addEventListener('click', (e) => {
         window.location.href = '/'
     })
+}
+
+
+export function match_making() {
+    let pop = document.createElement('div')
+    pop.setAttribute('id', 'match_popup')
+
+    pop.innerHTML = `
+		<div>
+			<div class="">
+				<p>waiting for others</p>
+			</div>
+			<ul id="user_list">
+			</ul>
+		</div>
+		`
+    return pop
+}
+
+
+export function update_match_making(usernames) {
+    let user_list = document.getElementById('user_list')
+    document.getElementById('match_popup').style.transform = ' translate(-50%, -50%) scale(1)'
+    user_list.innerHTML = ''
+    for (let i = 0; i < usernames.length; i++) {
+        let node = document.createElement("li");
+        node.innerHTML = usernames[i];
+        user_list.appendChild(node)
+    }
 }
