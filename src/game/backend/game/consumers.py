@@ -13,6 +13,7 @@ class GameConsumer(AsyncWebsocketConsumer):
 	async def connect(self):
 		print("GAME NEW CONNECTION")
 		await self.accept()
+		self.game_group_name = 'invite'
 		await self.channel_layer.group_add("invite",self.channel_name)
 
 		self.keycode= 0

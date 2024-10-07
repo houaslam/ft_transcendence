@@ -1,6 +1,6 @@
 import * as THREE from 'https://cdnjs.cloudflare.com/ajax/libs/three.js/0.167.0/three.module.js'
 import { OrbitControls } from 'https://cdn.skypack.dev/three@0.129.0/examples/jsm/controls/OrbitControls.js';
-import { customizeFrom , endgame, score, updateScore, time, updateTime, updateEndGame } from './elements.js';
+import { customizeFrom, endgame, score, updateScore, time, updateTime, updateEndGame } from './elements.js';
 
 
 const PLAYER_GEO = new THREE.BoxGeometry(1, .3, .3)
@@ -62,30 +62,28 @@ function gameSetup(scene, camera, renderer) {
 
 }
 
-function setup_canva(){
+function setup_canva() {
     let canva = document.getElementById("canva");
-	let scorePanel = score(0, 0)
+    let scorePanel = score(0, 0)
     let timePanel = time(0)
     canva.append(scorePanel)
     canva.append(timePanel)
     timePanel.style.display = 'none'
     scorePanel.style.display = 'none'
 
-	
+
 }
 
 function update_coordinates(gameObjects, coordinates, mode) {
     const { ball } = gameObjects;
-	ball.position.fromArray(coordinates.ball.position);
+    ball.position.fromArray(coordinates.ball.position);
 
     if (mode === 'game') {
-		const { player, otherPlayer } = gameObjects;
+        const { player, otherPlayer } = gameObjects;
         player.position.fromArray(coordinates.player.position);
         otherPlayer.position.fromArray(coordinates.otherPlayer.position)
-    } 
-	
-	else if (mode === 'multi') {
-		const {  player1, player2, player3, player4 } = gameObjects;
+    } else if (mode === 'multi') {
+        const { player1, player2, player3, player4 } = gameObjects;
         player1.position.fromArray(coordinates.player1.position);
         player2.position.fromArray(coordinates.player2.position);
         player3.position.fromArray(coordinates.player3.position);
@@ -93,8 +91,8 @@ function update_coordinates(gameObjects, coordinates, mode) {
     }
 }
 
-function create_objects_vs(scene){
-	let ball, player, otherPlayer, plane;
+function create_objects_vs(scene) {
+    let ball, player, otherPlayer, plane;
 
     //PLANE
     plane = new THREE.Mesh(new THREE.BoxGeometry(3, .2, 5), new THREE.MeshLambertMaterial({ color: 0x5F1584 }))
@@ -112,29 +110,29 @@ function create_objects_vs(scene){
     otherPlayer = new THREE.Mesh(PLAYER_GEO, new THREE.MeshLambertMaterial({ color: 0xE4E6FB }))
     otherPlayer.position.set(0, .4, -2.7)
 
-	scene.add(plane);
+    scene.add(plane);
     scene.add(player);
     scene.add(otherPlayer);
     scene.add(ball);
-	return {ball , player, otherPlayer, plane}
+    return { ball, player, otherPlayer, plane }
 }
 
-function create_objects_multi(scene){
+function create_objects_multi(scene) {
 
     //PLANE
-    let plane = new THREE.Mesh(new THREE.BoxGeometry(5, .2, 5),new THREE.MeshLambertMaterial({ color: 0x005599 }))
+    let plane = new THREE.Mesh(new THREE.BoxGeometry(5, .2, 5), new THREE.MeshLambertMaterial({ color: 0x005599 }))
 
     // 	BALL
-    let ball = new THREE.Mesh(new THREE.SphereGeometry(.2, 32, 15),new THREE.MeshLambertMaterial({ color: 0xffffff }))
+    let ball = new THREE.Mesh(new THREE.SphereGeometry(.2, 32, 15), new THREE.MeshLambertMaterial({ color: 0xffffff }))
 
     // PLAYER
-    let player1 = new THREE.Mesh(new THREE.BoxGeometry(1, .3, .3),new THREE.MeshLambertMaterial({ color: 0xff99ff }))
+    let player1 = new THREE.Mesh(new THREE.BoxGeometry(1, .3, .3), new THREE.MeshLambertMaterial({ color: 0xff99ff }))
 
-    let player2 = new THREE.Mesh(new THREE.BoxGeometry(1, .3, .3),new THREE.MeshLambertMaterial({ color: 0xffff88 }))
+    let player2 = new THREE.Mesh(new THREE.BoxGeometry(1, .3, .3), new THREE.MeshLambertMaterial({ color: 0xffff88 }))
 
-    let player3 = new THREE.Mesh(new THREE.BoxGeometry(1, .3, .3),new THREE.MeshLambertMaterial({ color: 0x22ffff }))
+    let player3 = new THREE.Mesh(new THREE.BoxGeometry(1, .3, .3), new THREE.MeshLambertMaterial({ color: 0x22ffff }))
 
-    let player4 = new THREE.Mesh(new THREE.BoxGeometry(1, .3, .3),new THREE.MeshLambertMaterial({ color: 0xff9900 }))
+    let player4 = new THREE.Mesh(new THREE.BoxGeometry(1, .3, .3), new THREE.MeshLambertMaterial({ color: 0xff9900 }))
 
 
     scene.add(player1);
@@ -143,7 +141,7 @@ function create_objects_multi(scene){
     scene.add(player4);
     scene.add(plane);
     scene.add(ball);
-	return {ball , player1, player2, player3, player4, plane}
+    return { ball, player1, player2, player3, player4, plane }
 }
 
 export function start(mode) {
@@ -151,27 +149,27 @@ export function start(mode) {
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     const renderer = new THREE.WebGLRenderer();
     const scene = new THREE.Scene();
-	
+
     gameSetup(scene, camera, renderer)
     let gameObjects
-    if (mode == 'vs')
-	    gameObjects = create_objects_vs(scene)
+    if (mode == 'game')
+        gameObjects = create_objects_vs(scene)
     else if (mode == 'multi')
-	    gameObjects = create_objects_multi(scene)
-
+        gameObjects = create_objects_multi(scene)
     renderer.setAnimationLoop(animation);
-	setup_canva()
+    setup_canva()
+
     function animation() {
         gameSocket.onmessage = (e) => {
-			const {type , data} = JSON.parse(e.data)
+            const { type, data } = JSON.parse(e.data)
             switch (type) {
                 case "coordinates":
-					update_coordinates(gameObjects, data, mode)
+                    update_coordinates(gameObjects, data, mode)
                     updateScore(gameObjects, data, mode)
                     break;
 
                 case "endGame":
-					updateEndGame()
+                    updateEndGame(data)
                     break;
 
                 case 'gameInfo':

@@ -204,7 +204,10 @@ class Game():
 			await channel_layer.group_send(game_group_name,
 				{
 					'type': 'time',
-					'data': int(elapsed)
+					'data': {
+						'elapsed' : int(elapsed),
+						'endTime' : self.goalTime
+						}
 				}
 			)
 			if (elapsed >= self.goalTime and all(player.score == self.players[0].score for player in self.players)):

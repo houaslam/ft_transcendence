@@ -1,9 +1,9 @@
 // import {gameOptions} from './game.js'
 
-export function customizeFrom(gameSocket){
-	let form = document.createElement("form")
-	form.setAttribute('id', 'custom-form')
-	form.innerHTML = `
+export function customizeFrom(gameSocket) {
+    let form = document.createElement("form")
+    form.setAttribute('id', 'custom-form')
+    form.innerHTML = `
 	<div id="gameOut">
 	<p class="label">choose game Out</p>
 	<div>
@@ -28,39 +28,21 @@ export function customizeFrom(gameSocket){
 	
 	<button id="play" type="submit">PLAY</button>
 	`
-	
-	form.addEventListener('submit', (e) =>{
-		e.preventDefault()
-		let data = new FormData(form);
-		let gameOptions = Object.fromEntries(data)
-		// history.pushState(null, null, '/ws/game')
-		gameSocket.send(JSON.stringify({
-			'type' : 'gameSettings',
-			'data': gameOptions
-		}))
-		form.remove()
-	})
-	document.getElementById('canva').append(form)
-	
-	return form
-}
 
+    form.addEventListener('submit', (e) => {
+        e.preventDefault()
+        let data = new FormData(form);
+        let gameOptions = Object.fromEntries(data)
+            // history.pushState(null, null, '/ws/game')
+        gameSocket.send(JSON.stringify({
+            'type': 'gameSettings',
+            'data': gameOptions
+        }))
+        form.remove()
+    })
+    document.getElementById('canva').append(form)
 
-export function endgame(data) {
-    let pop = document.createElement('div')
-    pop.setAttribute('id', 'popup')
-
-    let real_state = ""
-    if (data.state == "W")
-        real_state = "WON"
-    else
-        real_state = "LOST"
-    pop.innerHTML = `
-            <h4>YOU ${real_state}</h4>
-            <p>by ${data.by}</p>
-            <button id="back">BACK HOME</button>
-        `
-    return pop
+    return form
 }
 
 export function score(firstScore, secondScore) {
@@ -89,42 +71,11 @@ export function score(firstScore, secondScore) {
     return score
 }
 
-
-export function time(elapsedTime) {
-    let time = document.createElement('div')
-    time.setAttribute('id', 'timePanel')
-    time.innerHTML = `
-        <div class="container">
-            <div class="circular-progress">
-                <span class="progress-value">0 second</span>
-            </div>
-        </div>
-	`
-    return time
-}
-
-// ALL UPDATES SHOULD BE INDEPENDANT 
-
-export function updateTime(elapsedTime) {
-    let circularProgress = document.querySelector(".circular-progress"),
-        progressValue = document.querySelector(".progress-value");
-    let progressStartValue = elapsedTime,
-        progressEndValue = 10
-    let progressPercentage = (progressStartValue / progressEndValue) * 100;
-    progressValue.textContent = `${progressStartValue} s`;
-    if (progressStartValue > progressEndValue)
-        circularProgress.style.background = `conic-gradient(red ${progressPercentage * 3.6}deg, black 0deg)`;
-    else
-        circularProgress.style.background = `conic-gradient(#7d2ae8 ${progressPercentage * 3.6}deg, black 0deg)`;
-
-}
-
-
-export function updateScore( gameObjects, data, mode) {
+export function updateScore(gameObjects, data, mode) {
     const imageSrc = "{% static 'images/image.png' %}"
     let html = document.getElementById('players')
-	html.style.display = 'flex'
-    if (mode == 'game'){
+    html.style.display = 'flex'
+    if (mode == 'game') {
         html.innerHTML = `
             <div class="player-info">
                 <div class="player">
@@ -142,8 +93,7 @@ export function updateScore( gameObjects, data, mode) {
                 <h1>${data.otherPlayer.score}</h1>
             </div>
         `
-    }
-    else if (mode == 'multi'){
+    } else if (mode == 'multi') {
         html.innerHTML = `
         <div class="player-info">
             <div class="player">
@@ -178,12 +128,58 @@ export function updateScore( gameObjects, data, mode) {
 
 }
 
+export function time(elapsedTime) {
+    let time = document.createElement('div')
+    time.setAttribute('id', 'timePanel')
+    time.innerHTML = `
+        <div class="container">
+            <div class="circular-progress">
+                <span class="progress-value">0 second</span>
+            </div>
+        </div>
+	`
+    return time
+}
 
-export function updateEndGame(data){
+export function updateTime(data) {
+    let circularProgress = document.querySelector(".circular-progress"),
+        progressValue = document.querySelector(".progress-value");
+    let progressStartValue = data.elapsed,
+        progressEndValue = data.endTime
+    let progressPercentage = (progressStartValue / progressEndValue) * 100;
+    progressValue.textContent = `${progressStartValue} s`;
+    if (progressStartValue > progressEndValue)
+        circularProgress.style.background = `conic-gradient(red ${progressPercentage * 3.6}deg, black 0deg)`;
+    else
+        circularProgress.style.background = `conic-gradient(#7d2ae8 ${progressPercentage * 3.6}deg, black 0deg)`;
+
+}
+
+
+
+
+export function endgame(data) {
+    let pop = document.createElement('div')
+    pop.setAttribute('id', 'popup')
+
+    let real_state = ""
+    if (data.state == "W")
+        real_state = "WON"
+    else
+        real_state = "LOST"
+    pop.innerHTML = `
+            <h4>YOU ${real_state}</h4>
+            <p>by ${data.by}</p>
+            <button id="back">BACK HOME</button>
+        `
+    return pop
+}
+
+export function updateEndGame(data) {
     let endGame = endgame(data);
     document.getElementById('canva').append(endGame)
     endGame.style.transform = " translate(-50%, -50%) scale(1) "
-	let backHome = document.getElementById("back")
+    let backHome = document.getElementById("back")
     backHome.addEventListener('click', (e) => {
         window.location.href = '/'
     })
