@@ -14,16 +14,11 @@ function socketSetup(mode) {
         console.log("CONECTION ESTABLISHED")
     }
 
-    document.addEventListener('keydown', (event) => {
-        gameSocket.send(JSON.stringify({
-            'type': 'keycode',
-            'data': event.keyCode
-        }))
-    });
+
     return gameSocket
 }
 
-function gameSetup(scene, camera, renderer) {
+export function gameSetup(scene, camera, renderer) {
     camera.position.z = 5;
     camera.rotation.y = -Math.PI
 
@@ -62,7 +57,7 @@ function gameSetup(scene, camera, renderer) {
 
 }
 
-function setup_canva() {
+export function setup_canva() {
     let canva = document.getElementById("canva");
     let scorePanel = score(0, 0)
     let timePanel = time(0)
@@ -83,19 +78,19 @@ function update_coordinates(gameObjects, coordinates, mode) {
 
     if (mode === 'game') {
         const { player, otherPlayer } = gameObjects;
-        player.position.fromArray(coordinates.player.position);
-        otherPlayer.position.fromArray(coordinates.otherPlayer.position)
+        player.position.lerp(coordinates.player.position, 0.1);
+        otherPlayer.position.lerp(coordinates.otherPlayer.position, 0.1)
     } else if (mode === 'multi') {
         document.getElementById("match_popup").style.display = 'none'
         const { player1, player2, player3, player4 } = gameObjects;
-        player1.position.fromArray(coordinates.player1.position);
-        player2.position.fromArray(coordinates.player2.position);
-        player3.position.fromArray(coordinates.player3.position);
-        player4.position.fromArray(coordinates.player4.position);
+        player1.position.lerp(coordinates.player1.position, 0.1);
+        player2.position.lerp(coordinates.player2.position, 0.1);
+        player3.position.lerp(coordinates.player3.position, 0.1);
+        player4.position.lerp(coordinates.player4.position, 0.1);
     }
 }
 
-function create_objects_vs(scene) {
+export function create_objects_vs(scene) {
     let ball, player, otherPlayer, plane;
 
     //PLANE
@@ -107,12 +102,12 @@ function create_objects_vs(scene) {
 
     // PLAYER
     player = new THREE.Mesh(PLAYER_GEO, new THREE.MeshLambertMaterial({ color: 0x8C96ED }))
-    player.position.set(0, .4, 2.7)
+    player.position.set(0, .4, 2.35)
 
 
     //OTHERPLAYER
     otherPlayer = new THREE.Mesh(PLAYER_GEO, new THREE.MeshLambertMaterial({ color: 0xE4E6FB }))
-    otherPlayer.position.set(0, .4, -2.7)
+    otherPlayer.position.set(0, .4, -2.35)
 
     scene.add(plane);
     scene.add(player);
