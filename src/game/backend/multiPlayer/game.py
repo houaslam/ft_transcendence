@@ -46,7 +46,7 @@ class Player(GameObject):
 		target = self.position[0]
 		if (keycode == 37 ):
 			if (i % 2 == 0 and self.left - 0.5 >= plane.position[0]):
-				target -= 0.5
+    				target -= 0.5
 			elif (i%2 != 0 and self.left > - plane.dimension[0] / 2):
 				target -= 0.5
 

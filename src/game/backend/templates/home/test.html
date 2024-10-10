@@ -13,30 +13,64 @@
 
 <body>
 
-    <form id="tournam-regist">
-        <div class="player-set">
+    <form id="gameSettings-form">
+            <h3>Game settings</h3>
+            <div class="modes">
+                <p class="title">modes</p>
+                <div class="options">
 
-            <input name="player1" class="player-name">
-            <p>VS</p>
-            <input name="player2" class="player-name">
-        </div>
-        <div class="player-set">
-            <input name="player3" class="player-name">
-            <p>VS</p>
-            <input name="player4" class="player-name">
-        </div>
+                    <div class="option">
+                        
+                        <input type="radio" name="mode" value="score" class="radio" id="score">
+                        <label for="score" class="mode-label">Score</label>
+                    </div>
+                    
+                    <div class="option">
+                        
+                        <input type="radio" name="mode" value="time"  class="radio" id="time" checked>
+                        <label for="time" class="mode-label">Time</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="counts">
+                
+                <span class="title">seconds</span>
+                <input type="range" name="range" id="counts">
+            </div>
+
+            <div class="texture">
+                <p class="title"> texture</p>
+                <div class="options">
+
+                    <div class="option">
+                        <input type="radio" class="radio">
+                        <label class="mode-label " id="default"> default</label>
+                    </div>
+                    <div class="option">
+                        <input type="radio" class="radio">
+                        <label class="mode-label" id="special"> special</label>
+                    </div>
+                    <div class="option">
+                        <input type="radio" class="radio">
+                        <label class="mode-label" id="popular"> popular</label>
+                    </div>
+                    
+                </div>
+            </div>
+
+            <!-- <div class="texture">
+                <p class="title">background</p>
+                <input type="radio" class="radio">
+                <input type="radio" class="radio">
+                <input type="radio" class="radio">
+
+            </div> -->
 
         <button id="start" type="submit">Start</button>
 
     </form>
     <script>
-        form = document.getElementById("tournam-regist")
-        form.addEventListener('submit', (e) => {
-            e.preventDefault()
-            let data = new FormData(form);
-            let gameOptions = Object.fromEntries(data)
-            form.remove()
-        })
     </script>
 </body>
 
