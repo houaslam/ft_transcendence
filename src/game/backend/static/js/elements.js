@@ -50,23 +50,23 @@ export function score(firstScore, secondScore) {
     score.setAttribute('id', 'players')
     const imageSrc = "{% static 'images/image.png' %}"
     score.innerHTML = `
-        <div class="player-info">
-            <div class="player">
-            <img src="${imageUrl}" alt="Player Image" class='profile-pic'>
-                <p>hajar Ouaslam</p>
-            </div>
-            <h1>${firstScore}</h1>
-        </div>
+		<div class="player-info">
+			<div class="player">
+			<img src="${imageUrl}" alt="Player Image" class='profile-pic'>
+				<p>hajar Ouaslam</p>
+			</div>
+			<h1>${firstScore}</h1>
+		</div>
 
-        <h1>VS</h1>
+		<h1>VS</h1>
 
-        <div class="player-info">
-            <img src="${imageUrl}" alt="Player Image" class='profile-pic'>
-            <div class="player">
-                <p>kaouthar kouaz</p>
-            </div>
-            <h1>${secondScore}</h1>
-        </div>
+		<div class="player-info">
+			<img src="${imageUrl}" alt="Player Image" class='profile-pic'>
+			<div class="player">
+				<p>kaouthar kouaz</p>
+			</div>
+			<h1>${secondScore}</h1>
+		</div>
 	`
     return score
 }
@@ -77,53 +77,53 @@ export function updateScore(gameObjects, data, mode) {
     html.style.display = 'flex'
     if (mode == 'game') {
         html.innerHTML = `
-            <div class="player-info">
-                <div class="player">
-                    <p>hajar Ouaslam</p>
-                </div>
-                <h1>${data.player.score}</h1>
-            </div>
+			<div class="player-info">
+				<div class="player">
+					<p>hajar Ouaslam</p>
+				</div>
+				<h1>${data.player.score}</h1>
+			</div>
 
-            <h1>VS</h1>
+			<h1>VS</h1>
 
-            <div class="player-info">
-                <div class="player">
-                    <p>kaouthar kouaz</p>
-                </div>
-                <h1>${data.otherPlayer.score}</h1>
-            </div>
-        `
+			<div class="player-info">
+				<div class="player">
+					<p>kaouthar kouaz</p>
+				</div>
+				<h1>${data.otherPlayer.score}</h1>
+			</div>
+		`
     } else if (mode == 'multi') {
         html.innerHTML = `
-        <div class="player-info">
-            <div class="player">
-                <p>hajar Ouaslam</p>
-            </div>
-            <h1>${data.player1.score}</h1>
-        </div>
+		<div class="player-info">
+			<div class="player">
+				<p>hajar Ouaslam</p>
+			</div>
+			<h1>${data.player1.score}</h1>
+		</div>
 
 
-        <div class="player-info">
-            <div class="player">
-                <p>kaouthar kouaz</p>
-            </div>
-            <h1>${data.player2.score}</h1>
-        </div>
+		<div class="player-info">
+			<div class="player">
+				<p>kaouthar kouaz</p>
+			</div>
+			<h1>${data.player2.score}</h1>
+		</div>
 
-        <div class="player-info">
-            <div class="player">
-                <p>ferdaous adermouch</p>
-            </div>
-            <h1>${data.player3.score}</h1>
-        </div>
+		<div class="player-info">
+			<div class="player">
+				<p>ferdaous adermouch</p>
+			</div>
+			<h1>${data.player3.score}</h1>
+		</div>
 
-        <div class="player-info">
-            <div class="player">
-                <p>houda obenabad</p>
-            </div>
-            <h1>${data.player4.score}</h1>
-        </div>
-    `
+		<div class="player-info">
+			<div class="player">
+				<p>houda obenabad</p>
+			</div>
+			<h1>${data.player4.score}</h1>
+		</div>
+	`
     }
 
 }
@@ -132,11 +132,11 @@ export function time(elapsedTime) {
     let time = document.createElement('div')
     time.setAttribute('id', 'timePanel')
     time.innerHTML = `
-        <div class="container">
-            <div class="circular-progress">
-                <span class="progress-value">0 second</span>
-            </div>
-        </div>
+		<div class="container">
+			<div class="circular-progress">
+				<span class="progress-value">0 second</span>
+			</div>
+		</div>
 	`
     return time
 }
@@ -168,10 +168,10 @@ export function endgame(data) {
     else
         real_state = "LOST"
     pop.innerHTML = `
-    <h4>YOU ${real_state}</h4>
-    <p>by ${data.by}</p>
-    <button id="back">BACK HOME</button>
-    `
+	<h4>YOU ${real_state}</h4>
+	<p>by ${data.by}</p>
+	<button id="back">BACK HOME</button>
+	`
     return pop
 }
 
@@ -212,4 +212,193 @@ export function update_match_making(usernames) {
         node.innerHTML = usernames[i];
         user_list.appendChild(node)
     }
+}
+
+
+// NEW ONE
+
+function createRadioOption(name, value, label, checked = false) {
+	const modesOption = document.createElement('div') // DIV
+	modesOption.className = 'option'
+
+	const input = document.createElement('input')
+	input.className = 'radio'
+	input.type = 'radio'
+	input.name = name
+	input.value = value
+	input.id = value
+	if (checked) input.checked = true
+
+
+	modesOption.appendChild(input)
+
+	const labelOption = document.createElement('label')
+	labelOption.htmlFor = value
+	labelOption.className = 'radio-label'
+	labelOption.innerHTML = label
+
+	modesOption.appendChild(labelOption)
+
+
+
+	return modesOption
+}
+
+function createOption(name ,value, id,labelId , checked=false){
+		const mainDiv = document.createElement('Div')
+		mainDiv.className= 'option'
+
+		const inputOption = document.createElement('input')
+		inputOption.type = 'radio'
+		inputOption.className = 'radio'
+		inputOption.name = name
+		inputOption.value = value
+		inputOption.id = id
+		if (checked) inputOption.checked = true
+
+
+		const inputLabel = document.createElement('label')
+		inputLabel.htmlFor = id
+		inputLabel.classList = 'radio-label'
+		inputLabel.id = labelId
+		inputLabel.innerHTML = value
+		
+		mainDiv.append(inputOption)
+		mainDiv.append(inputLabel)
+		return mainDiv
+	}
+
+
+export function gameSettings(gameSocket) {
+
+
+	let canva = document.getElementById('canva')
+	let form = document.createElement('form')
+	form.id = 'gameSettings-form'
+
+	const heading = document.createElement('h3')
+	heading.innerHTML = 'Game settings'
+	form.appendChild(heading)
+
+	const modesDiv = document.createElement('div') // DIV
+	modesDiv.className = 'modes'
+	form.appendChild(modesDiv)
+
+	const modesTitle = document.createElement('p')
+	modesTitle.className = 'title'
+	modesTitle.innerHTML = 'modes'
+	modesDiv.appendChild(modesTitle)
+
+	const modesOptions = document.createElement('div') // DIV 
+	modesOptions.className = 'options'
+	modesDiv.appendChild(modesOptions)
+
+
+	const modesScore = createRadioOption('mode', 'score', 'Score')
+	modesOptions.appendChild(modesScore)
+
+	const modesTime = createRadioOption('mode', 'time', 'Time',  true)
+	modesOptions.appendChild(modesTime)
+
+	// RANGE 
+	const rangeDiv = document.createElement('div') // div
+	rangeDiv.className = 'counts'
+
+	const rangeValue = document.createElement('span')
+	rangeValue.className = 'title'
+	rangeValue.id = 'count'
+	rangeValue.innerHTML= 'Score'
+	rangeDiv.appendChild(rangeValue)
+
+	const rangeOptions = document.createElement('div')
+	rangeOptions.className = 'options'
+
+
+	const rangeInput = document.createElement('input')
+	rangeInput.type = ' range'
+	rangeInput.name = 'range'
+	rangeInput.id = 'counts'
+	rangeInput.onchange = (event) => rangeSlider(event.target.value);
+	rangeInput.min = '0'
+	rangeInput.max = '100'
+	rangeOptions.appendChild(rangeInput)
+
+	const rangeLabel = document.createElement('label')
+	rangeLabel.id = 'countLabel'
+	rangeLabel.innerHTML = '0'
+	rangeOptions.appendChild(rangeLabel)
+	rangeDiv.appendChild(rangeOptions)
+
+	form.appendChild(rangeDiv)
+
+	// TEXTURE 
+
+	const textureDiv = document.createElement('div')
+	textureDiv.className = 'texture'
+
+	const textureTitle = document.createElement('p')
+	textureTitle.innerHTML= 'Texture'
+	textureTitle.className= 'title'
+	
+	const textureOptions = document.createElement('div')
+	textureOptions.className = 'options'
+
+	textureOptions.appendChild(createOption('texture','default', 'default-tex', 'd-tex',true))
+	textureOptions.appendChild(createOption('texture','special', 'special-tex', 's-tex'))
+	textureOptions.appendChild(createOption('texture','popular', 'popular-tex', 'p-tex'))
+	textureDiv.appendChild(textureTitle)
+	textureDiv.appendChild(textureOptions)
+	form.appendChild(textureDiv)
+
+	// BACKGROUNG
+
+	const backgroundDiv = document.createElement('div')
+	backgroundDiv.className = 'background'
+
+	const backgroundTitle = document.createElement('p')
+	backgroundTitle.innerHTML= 'Background'
+	backgroundTitle.className= 'title'
+	
+	const backgroundOptions = document.createElement('div')
+	backgroundOptions.className = 'options'
+
+	backgroundOptions.appendChild(createOption('background', 'default', 'default-bac', 'd-bac',  true))
+	backgroundOptions.appendChild(createOption('background', 'special', 'special-bac', 's-bac'))
+	backgroundOptions.appendChild(createOption('background', 'popular', 'popular-bac', 'p-bac'))
+	backgroundDiv.appendChild(backgroundTitle)
+	backgroundDiv.appendChild(backgroundOptions)
+	form.appendChild(backgroundDiv)
+	
+	// SUBMIT BUTTON
+
+	const button = document.createElement('button')
+	button.id='start'
+	button.type='submit'
+	button.innerHTML='Start'
+	form.appendChild(button)
+
+	document.body.appendChild(form);
+	document.getElementById('score').addEventListener('click', () => {
+		document.getElementById('count').innerHTML = 'Score'
+	})
+	document.getElementById('time').addEventListener('click', () => {
+		document.getElementById('count').innerHTML = 'Seconds'
+	})
+
+	function rangeSlider(value) {
+		document.getElementById('countLabel').innerHTML = value
+
+	}
+	form.addEventListener('submit', (e) => {
+		e.preventDefault()
+		let data = new FormData(form);
+		let gameOptions = Object.fromEntries(data)
+		gameSocket.send(JSON.stringify({
+            'type': 'gameSettings',
+            'data': gameOptions
+        }))
+        form.remove()
+	})
+	document.getElementById('canva').append(form)
+
 }

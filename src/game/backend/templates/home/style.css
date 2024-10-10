@@ -12,7 +12,7 @@ body {
     background-color: #040716;
 }
 
-#gameSettings-form{
+#gameSettings-form {
     background-color: #190B39;
     width: 1200px;
     position: absolute;
@@ -22,57 +22,58 @@ body {
     padding: 2rem;
     border-radius: 15px;
     color: #FFFFFF;
-
     display: flex;
     flex-direction: column;
     gap: 4rem;
 }
 
-.modes{
+.modes,
+.counts,
+.texture,
+.background {
     display: flex;
-    gap: 2rem;
     align-items: center;
-
 }
 
-.radio{
+.title {
+    position: absolute;
+}
+
+.options {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 200px;
+    gap: 3rem;
+}
+
+.radio {
     display: none;
 }
 
-.title{
-    margin-right: 2rem;
+.radio-label,
+button {
+    background-color: none;
+    border: 1px solid #8056DE;
+    padding: 15px 70px;
+    border-radius: 8px;
+    cursor: pointer;
+    color: #8056DE;
+    font-weight: bold;
 }
 
-#score:checked ~ .mode-label,
-#time:checked ~ .mode-label
-{
+input[type="radio"]:checked~.radio-label {
     background-color: #8056DE;
     color: white;
 }
 
-.options{
+.counts {
     display: flex;
-    gap: 3rem;
-}
-
-.mode-label{
-    background-color: none;
-    border: 1px solid #8056DE;
-    padding: 20px 70px;
-    border-radius: 8px;
-    cursor: pointer;
-    color:#8056DE;
-    font-weight: bold;
-}
-
-.counts{
-    display: flex;
-    gap: 2rem;
     align-items: center;
 }
 
-#counts{
-    width: 65%;
+#counts {
+    width: 700px;
     height: 10px;
     outline: none;
     background: #EEEEEE;
@@ -80,30 +81,57 @@ body {
     border-radius: 15px;
 }
 
-#counts::-webkit-slider-thumb{
+#counts::-webkit-slider-thumb {
     -webkit-appearance: none;
     width: 25px;
     height: 25px;
     border-radius: 50%;
-    background:#FFFFFF;
+    background: #FFFFFF;
     border: 6px solid #6A38DC;
 }
 
-.texture{
-    display: flex;
-    gap: 2rem;
-    align-items: center;
-}
-
-#popular:hover{
+#p-tex:hover {
     background-image: url('./basket.png');
-
+    color: white;
 }
-#special:hover{
+
+#s-tex:hover {
     background-image: url('./tennis.png');
-
+    color: white;
 }
-#default:hover{
-    background-color: white;
 
+#d-tex:hover {
+    background-color: #EEEEEE;
+}
+
+#p-bac:hover {
+    background-image: url('./basket.png');
+    color: white;
+}
+
+#s-bac:hover {
+    background-image: url('./tennis.png');
+    color: white;
+}
+
+#d-bac:hover {
+    background-color: #EEEEEE;
+}
+
+#start {
+    width: 250px;
+    height: 50px;
+    width: 100px;
+    display: block;
+    margin: 0 auto;
+    background-color: #8056DE;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+#start:hover {
+    background-color: #6032c2;
 }

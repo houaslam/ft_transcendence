@@ -1,6 +1,6 @@
 import * as THREE from 'https://cdnjs.cloudflare.com/ajax/libs/three.js/0.167.0/three.module.js'
 import { OrbitControls } from 'https://cdn.skypack.dev/three@0.129.0/examples/jsm/controls/OrbitControls.js';
-import { customizeFrom, match_making, update_match_making, score, updateScore, time, updateTime, updateEndGame } from './elements.js';
+import { customizeFrom, match_making, update_match_making, score, updateScore, time, updateTime, updateEndGame, gameSettings } from './elements.js';
 
 
 const PLAYER_GEO = new THREE.BoxGeometry(1, .3, .3)
@@ -173,7 +173,7 @@ export function start(mode) {
                     break;
 
                 case 'gameInfo':
-                    customizeFrom(gameSocket)
+                    gameSettings(gameSocket)
                     break;
 
                 case 'time':
