@@ -200,7 +200,7 @@ const scene = new THREE.Scene();
 export function start(mode) {
 
 	const gameSocket = socketSetup(mode)
-	setup_canva()
+	// setup_canva()
 
 	let gameObjects, gameOptions, started = false
 	renderer.setAnimationLoop(animation);
@@ -210,7 +210,8 @@ export function start(mode) {
 		    const { type, data } = JSON.parse(e.data)
 		    switch (type) {
 		        case "coordinates":
-					started = false
+					document.getElementById('loader').style.display = 'none'
+					// started = false
 		            update_coordinates(gameObjects, data, mode)
 		            updateScore(gameObjects, data, mode)
 		            break;
@@ -237,7 +238,6 @@ export function start(mode) {
 		            break;
 
 				case 'startGame':
-						console.log("HEEEEY")
 						gameObjects = startGame(data)
 						started = true
 						break;
@@ -261,6 +261,9 @@ export function start(mode) {
 			camera.position.y +=0.005
 			camera.rotation.y +=0.002
 		}
+		else if (camera.position.z < 5)
+			document.getElementById('loader').style.display = 'block'
+
 		renderer.render(scene, camera);
 	}
 
