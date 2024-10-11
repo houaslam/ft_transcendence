@@ -31,6 +31,10 @@ class GameConsumer(AsyncWebsocketConsumer):
 		else:
 			print("IS INVITED")
 			self.game = await self.find_game()
+			await self.send(text_data=json.dumps({
+				'type' : 'startGame',
+				'data' : self.game.settings
+			}))
 			self.game.player_count += 1
 			await sync_to_async(self.game.save)()
 			if (self.game and await self.game_is_ready(self.game) and len(players)  >= 2):

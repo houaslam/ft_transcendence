@@ -1,49 +1,6 @@
 // import {gameOptions} from './game.js'
 
-export function customizeFrom(gameSocket) {
-    let form = document.createElement("form")
-    form.setAttribute('id', 'custom-form')
-    form.innerHTML = `
-	<div id="gameOut">
-	<p class="label">choose game Out</p>
-	<div>
-	<input type="radio" name="gameout" value="time" checked>
-	<label for="time">time</label>
-	</div>
-	<div>
-	<input type="radio" name="gameout" value="score">
-	<label for="local">score</label>
-	</div>
-	</div>
-	
-	<div>
-	<label for="counts" class="label">select count</label>
-	<select name="counts">
-	<option>10 </option>
-	<option>15</option>
-	<option>20</option>
-	<option>25</option>
-	<option>30</option>
-	</select>
-	
-	<button id="play" type="submit">PLAY</button>
-	`
-
-    form.addEventListener('submit', (e) => {
-        e.preventDefault()
-        let data = new FormData(form);
-        let gameOptions = Object.fromEntries(data)
-            // history.pushState(null, null, '/ws/game')
-        gameSocket.send(JSON.stringify({
-            'type': 'gameSettings',
-            'data': gameOptions
-        }))
-        form.remove()
-    })
-    document.getElementById('canva').append(form)
-
-    return form
-}
+import { startGame } from "./game.js"
 
 export function score(firstScore, secondScore) {
     let score = document.createElement('div')
@@ -155,9 +112,6 @@ export function updateTime(data) {
 
 }
 
-
-
-
 export function endgame(data) {
     let pop = document.createElement('div')
     pop.setAttribute('id', 'popup')
@@ -185,7 +139,6 @@ export function updateEndGame(data) {
     })
 }
 
-
 export function match_making() {
     let pop = document.createElement('div')
     pop.setAttribute('id', 'match_popup')
@@ -201,7 +154,6 @@ export function match_making() {
 		`
     return pop
 }
-
 
 export function update_match_making(usernames) {
     let user_list = document.getElementById('user_list')
@@ -318,6 +270,7 @@ export function gameSettings(gameSocket) {
 	rangeInput.type = ' range'
 	rangeInput.name = 'range'
 	rangeInput.id = 'counts'
+	rangeInput.value = '15'
 	rangeInput.onchange = (event) => rangeSlider(event.target.value);
 	rangeInput.min = '0'
 	rangeInput.max = '100'
@@ -389,16 +342,8 @@ export function gameSettings(gameSocket) {
 		document.getElementById('countLabel').innerHTML = value
 
 	}
-	form.addEventListener('submit', (e) => {
-		e.preventDefault()
-		let data = new FormData(form);
-		let gameOptions = Object.fromEntries(data)
-		gameSocket.send(JSON.stringify({
-            'type': 'gameSettings',
-            'data': gameOptions
-        }))
-        form.remove()
-	})
-	document.getElementById('canva').append(form)
 
+	canva.append(form)
+	return form
 }
+

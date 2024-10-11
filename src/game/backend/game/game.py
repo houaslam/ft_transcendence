@@ -104,7 +104,7 @@ class Game():
 		self.player = Player([0,.4,self.plane.dimension[2]/2 - .3], [0,-.1,.05], [1,.3,.3])
 		self.otherPlayer = Player([0,.4,-self.plane.dimension[2]/2 + .3], [0,-.1,.05], [1,.3,.3])
 		self.settings = settings
-		self.goalTime =  int(self.settings['counts'])
+		self.goalTime =  int(self.settings['range'])
   
 
 	def update(self):
@@ -113,11 +113,11 @@ class Game():
 		self.ball.update(self.plane, self.player, self.otherPlayer)
 
 	async def is_game_over(self, start_time, channel_layer):
-		if (self.settings['gameout'] == 'score'):
-			goal =  int(self.settings['counts'])
+		if (self.settings['mode'] == 'score'):
+			goal =  int(self.settings['range'])
 			return self.player.score == goal or self.otherPlayer.score == goal
 
-		if (self.settings['gameout'] == 'time'):
+		if (self.settings['mode'] == 'time'):
 			elapsed = time.time() - start_time
 			await channel_layer.group_send("invite",
 			{
@@ -203,8 +203,6 @@ async def startGame(channel_layer, hoster, invited):
 			'by' : message
       	} 
 	}))
-	print("HOSTER = ", hoster.game_result)
-	print("INVITED = ", invited.game_result)
 
 	await invited.send(text_data=json.dumps({
 		'type' : 'endGame',
