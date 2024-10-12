@@ -64,7 +64,6 @@ export function gameSetup(scene, camera, renderer, background) {
 	// ADD TO SCENE
 	scene.add(light)
 	
-	console.log("BACK = ", background)
 	const geometry = new THREE.SphereGeometry(8, 128, 128);
 	geometry.scale(-1, 1, 1);
 	
@@ -197,6 +196,10 @@ const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerH
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 const scene = new THREE.Scene();
 
+function handle_socket_msg(type, data){
+
+}
+
 export function start(mode) {
 
 	const gameSocket = socketSetup(mode)
@@ -213,13 +216,13 @@ export function start(mode) {
 					document.getElementById('loader').style.display = 'none'
 					// started = false
 		            update_coordinates(gameObjects, data, mode)
-		            updateScore(gameObjects, data, mode)
+		            // updateScore(gameObjects, data, mode)
 		            break;
 
-		        case "endGame":
+		        // case "endGame":
 
-		            updateEndGame(data)
-		            break;
+		        //     updateEndGame(data)
+		        //     break;
 
 		        case 'gameInfo':
 		            let form = gameSettings(gameSocket)
@@ -242,28 +245,30 @@ export function start(mode) {
 						started = true
 						break;
 
-		        case 'time':
-		            timePanel.style.display = 'flex'
-		            updateTime(data)
-		            break;
+		        // case 'time':
+		        //     timePanel.style.display = 'flex'
+		        //     updateTime(data)
+		        //     break;
 
 		        case 'match_making':
 		            update_match_making(data)
 		        default:
-		            break;
-		    }
-			if (started)
-		   		gameObjects.ball.rotation.x += 0.1
-		}
-		if (camera.position.z > 5 && started){
-			camera.position.z -= 0.1
-			camera.position.x += 0.01
-			camera.position.y +=0.005
-			camera.rotation.y +=0.002
-		}
-		else if (camera.position.z < 5)
-			document.getElementById('loader').style.display = 'block'
-
+					break;
+				}
+				if (started)
+					gameObjects.ball.rotation.x += 0.1
+			}
+			if (camera.position.z > 5 && started){
+				camera.position.z -= 0.1
+				camera.position.x += 0.01
+				camera.position.y +=0.005
+				camera.rotation.y +=0.002
+			}
+			else if (camera.position.z < 5 && started){
+				document.getElementById('blurryScreen').style.transform = 'translate(-50%, -50%) scale(1)'
+				document.getElementById('loader').style.display = 'block'
+			}
+			
 		renderer.render(scene, camera);
 	}
 

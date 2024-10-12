@@ -187,6 +187,7 @@ function createRadioOption(name, value, label, checked = false) {
 	const labelOption = document.createElement('label')
 	labelOption.htmlFor = value
 	labelOption.className = 'radio-label'
+	labelOption.style.backgroundImage = 'url(`static/img/background/popular.png`)'
 	labelOption.innerHTML = label
 
 	modesOption.appendChild(labelOption)
@@ -267,13 +268,13 @@ export function gameSettings(gameSocket) {
 
 
 	const rangeInput = document.createElement('input')
-	rangeInput.type = ' range'
+	rangeInput.type = 'range'
 	rangeInput.name = 'range'
 	rangeInput.id = 'counts'
-	rangeInput.value = '15'
+	rangeInput.value = 15
 	rangeInput.onchange = (event) => rangeSlider(event.target.value);
-	rangeInput.min = '0'
-	rangeInput.max = '100'
+	rangeInput.min = 0
+	rangeInput.max = 100
 	rangeOptions.appendChild(rangeInput)
 
 	const rangeLabel = document.createElement('label')
