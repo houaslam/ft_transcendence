@@ -33,7 +33,7 @@ export function gameSetup(scene, camera, renderer, background) {
 	// RENDERER
 	renderer.setSize(window.innerWidth, window.innerHeight);
 	renderer.shadowMap.enabled = true;
-	document.getElementById('canva').appendChild(renderer.domElement)
+	document.body.appendChild(renderer.domElement)
 
 	// document.gatEle.appendChild(renderer.domElement)
 
@@ -93,13 +93,10 @@ export function setup_canva() {
 	let canva = document.getElementById("canva");
 	let scorePanel = score(0, 0)
 	let timePanel = time(0)
-	let matchMaking = match_making()
 	canva.append(scorePanel)
 	canva.append(timePanel)
-	canva.append(matchMaking)
 	timePanel.style.display = 'none'
 	scorePanel.style.display = 'none'
-		// matchMaking.style.display = 'none'
 
 
 }
@@ -203,20 +200,25 @@ function handle_socket_msg(type, data){
 export function start(mode) {
 
 	const gameSocket = socketSetup(mode)
-	// setup_canva()
+	setup_canva()
 
 	let gameObjects, gameOptions, started = false
 	renderer.setAnimationLoop(animation);
 
+	document.getElementById('cancel').addEventListener('click', ()=>{
+		console.log('CLICKED')
+		window.location.href = '/'
+	})
 	function animation() {
 		gameSocket.onmessage = (e) => {
 		    const { type, data } = JSON.parse(e.data)
 		    switch (type) {
 		        case "coordinates":
 					document.getElementById('loader').style.display = 'none'
-					// started = false
+					document.getElementById('blurryScreen').style.transform = 'translate(-50%, -50%) scale(0)'
+					started = false
 		            update_coordinates(gameObjects, data, mode)
-		            // updateScore(gameObjects, data, mode)
+		            updateScore(gameObjects, data, mode)
 		            break;
 
 		        // case "endGame":
@@ -267,6 +269,7 @@ export function start(mode) {
 			else if (camera.position.z < 5 && started){
 				document.getElementById('blurryScreen').style.transform = 'translate(-50%, -50%) scale(1)'
 				document.getElementById('loader').style.display = 'block'
+
 			}
 			
 		renderer.render(scene, camera);

@@ -12,15 +12,61 @@ body {
     background-color: #040716;
 }
 
-.blurryScreen{
-    background-color: rgba(109, 60, 104, 0.157);
-    width: 400px;
-    height: 300px;
-    filter: blur(15px);
-    /* border: 3px solid green; */
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 11;
+#players{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+
+.holder{
+    gap: .2rem;
+    display: flex;
+    
+}
+
+.player-info{
+    background-color: rgb(91, 55, 126);
+    width: 300px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    padding: 0 .5rem;
+    gap: 1rem;
+}
+
+.middle{
+    background-color: rgb(91, 55, 126);
+    width: 50px;
+    height: 95px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: xx-large;
+}
+
+.right{
+    border-radius: 0 0 10px 0;
+}
+
+.left{
+    border-radius: 0 0 0 10px;
+}
+
+.score{
+    background-color: rgb(91, 55, 126);
+    width: 70px;
+    height: 95px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: xx-large;
+}
+
+
+
+.profile-img{
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
 }

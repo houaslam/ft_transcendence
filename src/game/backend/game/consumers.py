@@ -35,6 +35,7 @@ class GameConsumer(AsyncWebsocketConsumer):
 				'type' : 'startGame',
 				'data' : self.game.settings
 			}))
+			await asyncio.sleep(2)
 			self.game.player_count += 1
 			await sync_to_async(self.game.save)()
 			if (self.game and await self.game_is_ready(self.game) and len(players)  >= 2):

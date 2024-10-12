@@ -5,25 +5,27 @@ import { startGame } from "./game.js"
 export function score(firstScore, secondScore) {
     let score = document.createElement('div')
     score.setAttribute('id', 'players')
-    const imageSrc = "{% static 'images/image.png' %}"
     score.innerHTML = `
-		<div class="player-info">
-			<div class="player">
-			<img src="${imageUrl}" alt="Player Image" class='profile-pic'>
-				<p>hajar Ouaslam</p>
-			</div>
-			<h1>${firstScore}</h1>
-		</div>
+        <div class="holder">
+            <div class="player-info left">
+                <img class="profile-img" src="./tennis.png">
+                <p>user1</p>
+            </div>
+            <div class="score left">
+                <h1>0</h1>
+            </div>
+            <div class=" middle">
+                <h3>:</h3>
+            </div>
+            <div class="score right">
+                <h1>0</h1>
+            </div>
+            <div class="player-info right glass">
+                <img class="profile-img" src="./basket.png">
+                <p>user2</p>
+            </div>
 
-		<h1>VS</h1>
-
-		<div class="player-info">
-			<img src="${imageUrl}" alt="Player Image" class='profile-pic'>
-			<div class="player">
-				<p>kaouthar kouaz</p>
-			</div>
-			<h1>${secondScore}</h1>
-		</div>
+        </div>
 	`
     return score
 }
@@ -34,21 +36,26 @@ export function updateScore(gameObjects, data, mode) {
     html.style.display = 'flex'
     if (mode == 'game') {
         html.innerHTML = `
-			<div class="player-info">
-				<div class="player">
-					<p>hajar Ouaslam</p>
+        <div class="holder">
+            <div class="player-info left">
+                <p>user1</p>
+            </div>
+			<div class="element">
+				<div class="score left">
+					<h1>${data.player.score}</h1>
 				</div>
-				<h1>${data.player.score}</h1>
-			</div>
-
-			<h1>VS</h1>
-
-			<div class="player-info">
-				<div class="player">
-					<p>kaouthar kouaz</p>
+				<div class=" middle">
+					<h3>:</h3>
 				</div>
-				<h1>${data.otherPlayer.score}</h1>
+				<div class="score right">
+					<h1>${data.otherPlayer.score}</h1>
+				</div>
 			</div>
+            <div class="player-info right">
+                <p>user2</p>
+            </div>
+
+        </div>
 		`
     } else if (mode == 'multi') {
         html.innerHTML = `
