@@ -1,0 +1,291 @@
+/* h1
+{
+    font-size: 2.7rem;
+    font-weight: bold;
+} */
+h2
+{
+  font-size: max(2vw, 2vh)
+}
+p,label
+{
+    font-size: max(0.8vw, 0.9vh);
+}
+.iconify
+{
+    width: 100%;
+    font-size: max(2.5vw, 2.5vh);
+    color: white;
+    pointer-events: none;
+}
+.status
+{
+  position: relative;
+
+  &::after
+  {
+    content: "";
+    height: max(0.7vw, 1vh);
+    width: max(0.7vw, 1vh);
+    border-radius: 50%;
+    
+    position: absolute;
+    left: 110%;
+    top: 27%;
+  }
+}
+#online::after
+{
+    background-color: var(--online);
+}
+#offline::after
+{
+    background-color: var(--offline);
+}
+#unknown::after
+{
+    background-color: var(--unknown);
+}
+#button-type1
+{
+    border-radius: 35px; 
+    height: 60px;
+    margin: 7px 0px 0px 0px;
+
+    border: none;
+    background: var(--button-type1);
+    color: white;
+    font-size: 1.3rem;
+    font-weight: bold;
+    background-size: 200%;
+    background-position: 0%;
+    cursor: pointer;
+
+    &:hover
+    {
+        animation: anime 1.3s forwards;
+    }
+}
+
+.button-type2
+{
+  width: max(40%, 10vw);
+  height: max(31%, 8vh);
+  border-radius: min(1vw, 1vh);
+  background-color: var(--highlight);
+  color: white;
+  font-size: max(1.3rem, 2.3vh);;
+  font-weight: 900;
+  margin-top: auto;
+  cursor: pointer;
+  border: none;
+  
+  &:hover
+  {
+    transition: 0.2s ease-in;
+    border: solid 1px var(--highlight);
+    background-color: rgba(0,0,0,0);
+    color: var(--highlight)
+  }
+}
+.button-type3
+{
+    width: max(10vw, 10vh);
+    height: min(7vw, 7vh);
+    border : none;
+    border-radius: min(1.5vw, 3vh);
+    font-size: max(1.3vw, 1.5vh);
+    font-weight: 700;
+    cursor: pointer;
+    background-color : var(--delete);
+    color : white;
+
+    &:hover
+    {
+      transition: 0.2s ease-in;
+      border: solid 1px var(--delete);
+      background-color: rgba(0,0,0,0);
+      color: var(--delete)
+    }
+}
+
+.button-type4
+{
+    width: max(10vw, 10vh);
+    height: min(7vw, 7vh);
+    border : none;
+    border-radius: min(1.5vw, 3vh);
+    font-size: max(1.3vw, 1.5vh);
+    font-weight: 700;
+    cursor: pointer;
+    background-color : var(--secondary);
+    color : white;
+
+    &:hover 
+    {
+      transition: 0.2s ease-in;
+      background-color: var(--secondary-hover);
+    }
+}
+.anchor-box
+{
+  height: max(4vw, 5vh);
+  width: max(4vw, 5vh);
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.circle
+{
+  border-radius: 50%;
+  background-color: var(--secondary2);
+  position: relative;
+  &:hover
+  {
+    background-color: var(--secondary2-hover);
+  }     
+}
+.active-notification::before
+  {
+      content: "";
+      height: 12px;
+      width: 12px;
+      background-color: var(--highlight);
+      
+      position: absolute;
+      border-radius: 50%;
+      left: 0;
+      bottom: 0;
+  }    
+.square 
+{
+  background-color: var(--secondary);
+  border-radius: 15px;
+  &:hover
+  {
+    background-color: var(--secondary-hover);
+  }
+}  
+.custom-table
+{
+  padding: max(3%, 2vh);
+  box-sizing: border-box;
+  max-height: 100%;
+  height: 100%;
+  overflow: hidden;
+  h3 {
+    font-size: max(1.5vw, 2.4vh);
+    padding-bottom: max(1vh, 1vw);
+  }
+
+  #table
+  {
+    display: flex;
+    flex-direction: column;
+    gap : max(3%, 1vw);
+    max-height: 100%;
+    height: 83%;
+    .custom-table-head
+    {
+      display: grid;
+      grid-template-rows: 1fr;
+      align-items: center;
+      padding: 0 1.5vw;
+      box-sizing: border-box;
+      background-color: var(--secondary3);
+      border: solid 0.1vh var(--secondary);
+      height: max(7%, 4vh);
+      border-radius: 3vw;
+      
+      p 
+      {
+        font-size: max(1vw, 0.8vh);
+      }
+    }
+    .custom-table-content
+    {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      overflow-y: auto;
+
+      &::-webkit-scrollbar
+      {
+          width: 7px;
+      }
+      &::-webkit-scrollbar-thumb
+      {
+          background-color: var(--secondary2);
+          border-radius : 10px;
+      }
+      .custom-table-row
+      {
+        display: grid;
+        grid-template-rows: 1fr;
+        padding: min(1vh, 1vw) 1.5vw;
+        border-bottom: solid 0.1vh rgba(128, 86, 222, 0.2) ;
+        p {
+          font-size: max(0.8vw, 0.7vh);
+        }
+      }
+      #table-no-results
+      {
+        text-align: center;
+      }
+    }
+  }
+}
+
+/* if i do have a lot of keyframes it needs to be on its own file */
+@keyframes anime {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 100% 100%;
+  }
+}
+
+@media (max-width : 750px)
+{
+    /* .iconify
+    {
+      font-size: 20px;
+    } */
+    /* h2
+    {
+        font-size: 16px;
+    } */
+    /* h3 
+    {
+      font-size: 12px;
+    } */
+    /* .anchor-box
+    {
+      height: 40px;
+      width: 40px;
+    } */
+    /* p,label
+    {
+        font-size: 0.5rem;
+    } */
+    /* .button-type2
+    {
+      width: 70px;
+      height: 35px;
+
+      font-size: 12px;
+    } */
+
+    .table-box
+    {
+      #table
+      {
+          height: 100px; 
+      }
+    }
+} 

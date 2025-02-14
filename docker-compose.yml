@@ -1,0 +1,145 @@
+services:
+
+  user_management:
+    container_name: user_management
+    depends_on:
+      UserManagementPostgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      game:
+        condition: service_started
+    build:
+      context: ./requirements/user_management/
+      dockerfile: Dockerfile
+    ports:
+      - 8000:8000
+    restart: on-failure
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_DB=${USER_MANAGEMENT_DB_NAME}
+      - DB_HOST=${USER_MANAGEMENT_DB_HOST}
+    networks:
+      - transcendence
+    volumes:
+      - ./requirements/user_management/user_management:/usr/src/user_management
+
+  UserManagementPostgres:
+    image: postgres:15.8
+    container_name: UserManagementPostgres
+    restart: on-failure
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_DB=${USER_MANAGEMENT_DB_NAME}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready", "-U", "$$POSTGRES_USER", "-d", "$$POSTGRES_DB"]
+      interval: 10s
+      timeout: 30s
+      retries: 5
+      start_period: 60s
+    networks:
+      - transcendence
+
+  game:
+    container_name: game
+    depends_on:
+      GamePostgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    build:
+      context: ./requirements/game/
+      dockerfile: Dockerfile
+    restart: on-failure
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_DB=${GAME_DB_NAME}
+      - DB_HOST=${GAME_DB_HOST}
+    networks:
+      - transcendence
+    volumes:
+      -  ./requirements/game/backend:/usr/src/game
+    
+  GamePostgres:
+    image: postgres:15.8
+    container_name: GamePostgres
+    restart: on-failure
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_DB=${GAME_DB_NAME}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready", "-U", "$$POSTGRES_USER", "-d", "$$POSTGRES_DB"]
+      interval: 10s
+      timeout: 30s
+      retries: 5
+      start_period: 60s
+    networks:
+      - transcendence
+  
+  frontend:
+    build:
+      context: ./requirements/frontend/
+      dockerfile: Dockerfile
+    container_name: frontend
+    restart: on-failure
+    env_file:
+      - .env
+    networks:
+      - transcendence
+    volumes:
+      - ./requirements/frontend:/var/www 
+  
+  nginx:
+    build:
+      context: ./requirements/nginx/
+      dockerfile: Dockerfile
+    container_name: nginx
+    restart: on-failure
+    ports:
+      - 8010:8010
+    env_file:
+      - .env
+    networks:
+      - transcendence
+    depends_on:
+      - user_management
+      - frontend
+      - game
+      - user_game_aggregator
+  
+  user_game_aggregator:
+    container_name: user_game_aggregator
+    build:
+      context: ./requirements/user_game_aggregator/
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    restart: on-failure
+    networks:
+      - transcendence
+    depends_on:
+      - user_management
+      - game
+    
+  
+  redis:
+    container_name: redis
+    image: redis:7.2-alpine
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping | grep PONG"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 30s
+    restart: on-failure
+    networks:
+      - transcendence
+
+networks:
+  transcendence:
+    driver: bridge
+

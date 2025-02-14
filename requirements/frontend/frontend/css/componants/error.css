@@ -1,0 +1,34 @@
+#error-container
+{
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    div 
+    {
+
+        opacity: 0;
+        transform: translateY(-50px);
+        animation: fallAnimation 1.5s ease-out forwards;
+        h1 
+        {
+            font-size: max(13vw, 12.9vh);
+            background: var(--profile-btm);
+            -webkit-text-fill-color: transparent;
+            -webkit-background-clip: text;
+        }
+    }
+}
+
+@keyframes fallAnimation {
+    0% {
+      opacity: 0;
+      transform: translateY(-50px); /* Start above the viewport */
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0); /* End at its normal position */
+    }
+  }
