@@ -13,20 +13,20 @@ class appCanva{
     initElemnts( players ){
         this.waiting = this._createElement('div', 'waiting-holder', `
             <div class="waiting-pop glass">
-				<h1>Waiting for other player...</h1>
+				<h1 id="waiting_msg">Waiting for opponents...</h1>
 				<div id="loader"></div>
 				<button id="cancel-btn">Cancel</button>
 			</div>
 	    `)
         this.score = this._createElement( 'div', 'score',  `
             <div class="user glass">
-                <h3 id="user2">${players[1]}</h3>
+                <h3 id="user1">${players[0]}</h3>
             </div>
             <div class="score-num glass">
                 <h1 id="score">0 : 0</h1>
             </div>
             <div class="user glass">
-                <h3 id="user1">${players[0]}</h3>
+                <h3 id="user2">${players[1]}</h3>
             </div>
 	    `)
         this.time = this._createElement( 'div','time glass',  `<h1 id="time">0</h1>`)
@@ -41,13 +41,13 @@ class appCanva{
             else 
                 data.name.p2 = 'me'
             this.score.innerHTML = `<div class="user glass">
-                    <h3 id="user1">${data.name.p2}</h3>
+                    <h3 id="user1">${data.name.p1}</h3>
                 </div>
                 <div class="score-num glass">
                     <h1 id="score">0 : 0</h1>
                 </div>
                 <div class="user glass">
-                    <h3 id="user2">${data.name.p1}</h3>
+                    <h3 id="user2">${data.name.p2}</h3>
                 </div>
             `
         }
@@ -58,13 +58,13 @@ class appCanva{
             else 
                 player2 = 'Your Team'
             this.score.innerHTML = `<div class="user glass">
-                <h3 id="user1">${player2}</h3>
+                <h3 id="user1">${player1}</h3>
                 </div>
                 <div class="score-num glass">
                     <h1 id="score">0 : 0</h1>
                 </div>
                 <div class="user glass">
-                    <h3 id="user2">${player1}</h3>
+                    <h3 id="user2">${player2}</h3>
                 </div>
             `
         }
@@ -102,19 +102,30 @@ class appCanva{
         }
     }
     update(element, data){
-        if ( !this.elementsId )
+        if ( this.elementsId == null )
             this.elementsId = {
                 p1: document.getElementById('user1'),
                 p2: document.getElementById('user2'),
                 score: document.getElementById( 'score' ),
-                time: document.getElementById( 'time' )
+                time: document.getElementById( 'time' ),
+                waiting: document.getElementById( 'waiting_msg' )
             }
         switch (element) {
             case 'score':
-                this.elementsId.score.innerHTML = `${data.score.p2} : ${data.score.p1}`
+                if ( this.elements.score )
+                    this.elements.score.innerHTML = `${data.score.p1} : ${data.score.p2}`
+                else
+                    this.elements.score=  document.getElementById( 'score' )
                 break;
             case 'time':
-                this.elementsId.time.innerHTML = data
+                if ( this.elementsId.time)
+                    this.elementsId.time.innerHTML = data
+                else 
+                    this.elements.time=  document.getElementById( 'time' )
+                break;
+            case 'waiting':
+                if ( this.elementsId.waiting )
+                        this.elementsId.waiting.innerHTML += `<br> A player joined`
                 break;
             default:
                 break;

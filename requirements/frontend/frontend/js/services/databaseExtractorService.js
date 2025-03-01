@@ -1,12 +1,12 @@
 import { onlineStatusService } from "../managers/globalManager.js"
+import { determineUserStatus } from "../utils/utils.js"
 
 export class databaseExtractorService
 {
     constructor(database)
     {
         this._database = database
-        
-        // console.log('database : ', this._database)
+
     }
     extractData(type)
     {
@@ -16,7 +16,6 @@ export class databaseExtractorService
             'friendsList' : this.extractDataForFriendsList.bind(this),
             'friendsRequests' : this.extractDataForFriendsRequests.bind(this),
             'leaderboard' : this.extractDataForLeaderboard.bind(this),
-            'notifications' : this.extractDataForNotifications.bind(this),
             'settings' : this.extractDataforSettings.bind(this)
         }
 
@@ -44,7 +43,7 @@ export class databaseExtractorService
             userId : user_id,
             username,
             profilePic : profile_pic_url,
-            status  : this.determineUserStatus(user_id, relationship),
+            status  : determineUserStatus(user_id, relationship),
             friendsCount : friends_count,
             totalGames : total_games,
             totalPoints : total_points,
@@ -75,7 +74,7 @@ export class databaseExtractorService
             username : friend.relationship ? friend.user_details.username : 'Me',
             profilePic : friend.user_details.profile_pic_url,
             relationship : friend.relationship,
-            other : this.determineUserStatus(friend.user_details.user_id, friend.relationship),
+            other : determineUserStatus(friend.user_details.user_id, friend.relationship),
             type : 'friend'
         }))
     }
@@ -95,7 +94,6 @@ export class databaseExtractorService
     {
         return this._database.map(row => (
         {
-            userId : row.user_id,
             username : row.username,
             rank : row.rank,
             totalPoints : row.total_points
@@ -121,33 +119,5 @@ export class databaseExtractorService
             'requests' : ['cancel_request','accept_request']
         }
         return (ActionType[type])
-    }
-
-    determineUserStatus(userId, relationship)
-    {
-        const onlineFriendsList = onlineStatusService._onlineFriendsList
-        const relationshipStatus = relationship ?  relationship.status : 'me'
-
-        console.log('the one i get when getting profle view onlineList : ', onlineFriendsList)
-        // console.log('status : ', relationshipStatus)
-        // console.log('userId  :', userId )
-        if ((relationshipStatus === 'friend' && onlineFriendsList.includes(Number(userId)) === true ) || relationshipStatus === 'me')
-            return ('online')
-        else if (relationshipStatus === 'friend' && onlineFriendsList.includes(Number(userId)) === false)
-            return ('offline')
-        else
-            return ('unknown')
-    }
-    extractDataForNotifications()
-    {
-        return this._database.map(obj => (
-        {
-            sender : obj.sender,
-            content : obj.content,
-            profilePic : obj.profile_pic,
-            time : obj.time,
-            seen : obj.seen
-        })
-        )
     }
 }

@@ -4,6 +4,7 @@ import { globalManager } from '../managers/globalManager.js'
 import { ENDPOINTS } from '../constants/endpoints.js'
 import { eventListeners } from "../managers/globalManager.js"
 import { modalService } from '../services/modalService.js'
+import { onlineStatusService } from '../managers/globalManager.js'
 
 export function removeModalHandler( event, resolve , type)
 {
@@ -17,20 +18,35 @@ export function removeModalHandler( event, resolve , type)
             resolve(  ) 
     }
 }
+export function determineUserStatus(userId, relationship)
+{
+    const onlineFriendsList = onlineStatusService._onlineFriendsList
+    const relationshipStatus = relationship ?  relationship.status : 'me'
+
+    if ((relationshipStatus === 'friend' && onlineFriendsList.includes(Number(userId)) === true ) || relationshipStatus === 'me')
+        return ('online')
+    else if (relationshipStatus === 'friend' && onlineFriendsList.includes(Number(userId)) === false)
+        return ('offline')
+    else
+        return ('')
+}
 export function  delay(ms)
 {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
-export function write(text, speed, target)
+export function write(text, speed)
 {
     let i = 0
+    const headerHighlight = document.getElementById('header-highlight')
+    const h2 = document.createElement('h2')
+    h2.id = "welcome-text"
+    headerHighlight.replaceChildren(h2)
 
-    
     async function typing()
     {
         if (i < text.length)
         {
-            target.innerHTML += text[i]
+            h2.innerHTML += text[i]
             i++
 
             await delay(speed)
@@ -39,6 +55,27 @@ export function write(text, speed, target)
     }
 
     typing()
+
+}
+export function unwrite(speed, target)
+{
+    let i = 0
+    let text = target.innerHTML
+
+    const intervalId = setInterval(async () => {
+        if (text.length)
+        {
+            text = text.slice(0, -1)
+            target.innerHTML = text
+        }
+        else
+        {
+            clearInterval(intervalId)
+            setTimeout(() => {
+                document.getElementById('header-highlight').innerHTML = '<img src="../../assets/componants/logo.png">'
+            }, 3000)
+        }
+    }, speed)
 
 }
 export function loader(delay)
@@ -57,6 +94,7 @@ export async function reset()
     await loader(1500)
     app.innerHTML = layoutTemplate()
     app.classList.add('active')
+    document.getElementById('header-highlight').innerHTML = '<img src="../../assets/componants/logo.png">'
 }
 export function debounce(func, delay)
 {
@@ -73,7 +111,6 @@ export function debounce(func, delay)
 }
 export async function tokenExpired(func = null)
 {
-    console.log('->>>>>>> access token was expired')
     const response = await fetch(ENDPOINTS.REFRESH_TOKEN , {
         method : 'POST',
         headers : {
@@ -83,7 +120,6 @@ export async function tokenExpired(func = null)
     })
     if (response.status === 401)
     {
-        console.log('->>>>>> refresh token was expired')
         tokenService.clear()
         await modalService.show('the user is no more authenticated !!!', true)
         document.getElementById('app').classList.remove('active')

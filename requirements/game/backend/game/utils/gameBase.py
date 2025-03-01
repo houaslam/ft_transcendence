@@ -16,7 +16,7 @@ class Vector3:
 class Game():
 	def __init__( self, mode ):
 		self.mode = mode
-		self.ball = Ball( Vector3( 0 , 0, 0), Vector3( .05,-.07,.1 ), Vector3( .2,.2,.2 ) )
+		self.ball = Ball( Vector3( 0 , 0, 0), Vector3( .04,-.06,.1 ), Vector3( .2,.2,.2 ) )
 		self.ball.velocity.x *= random.choice([-1, 1]) 
 		self.ball.velocity.z *= random.choice([-1, 1])
 
@@ -35,10 +35,10 @@ class Game():
 							 Player( Vector3( 1.5, 0, -(self.plane.dimension.z )/2 ), Vector3( 0,-.1,.05 ), Vector3( 1,.3,.1 ) ) ]
 
 
-	def update(self):
+	async def update(self):
 		for player in self.players:
 			player.update()
-		self.ball.update(self.plane, self.players, self.mode )
+		await self.ball.update(self.plane, self.players, self.mode )
 
 	async def is_over(self):
 		return any( player.score == WINNING_SCORE for player in self.players )
@@ -61,37 +61,32 @@ class Game():
 
 	def end_game_results(self, consumers, gameModel):
 		if self.mode == TWO_PLAYERS:
-			base = ['won', 'lost']
 			if consumers[1].keycode == -1 or consumers[0].keycode == -1:
+				base = ['Other player discarded', 'You lost']
 				loser_index = 0 if consumers[0].keycode == -1 else 1
 				winner_index = 1 - loser_index
     
-				self.players[loser_index].score = 0
 				for consumer, state in zip(consumers, base if loser_index == 1 else reversed(base)):
 					consumer.game_result = state
 				
 				gameModel.winner = consumers[winner_index].playerModel
 			else:
+				base = ['You won', 'You lost']
 				winner_index = 0 if self.players[0].score > self.players[1].score else 1
 				for consumer, state in zip(consumers, base if winner_index == 0 else reversed(base)):
 					consumer.game_result = state
 				gameModel.winner = consumers[winner_index].playerModel
 
-
-			gameModel.winner.level =  round(math.sqrt( consumers[1].playerModel.total_points ) * .9, 2)
+			gameModel.winner.level =  round(math.sqrt( gameModel.winner.total_points ) * .9, 2)
 
 		elif self.mode == MULTI_PLAYERS:
-			base = ['won', 'won', 'lost', 'lost']
+			base = ['You won', 'You won', 'You lost', 'You lost']
    
 			if any( consumer.keycode == -1 for consumer in consumers ):
 				loser_index = [0,1] if consumers[0].keycode == -1 or consumers[1].keycode == -1 else [2, 3]
 			else:
 				loser_index = [0,1] if self.players[0].score < self.players[2].score else [2, 3]
 			winner_index = [i for i in range(4) if i not in loser_index]
-				
-			for i in loser_index:
-					self.players[i].score = 0
-
 
 			for consumer, state in zip(consumers, base if loser_index == [2,3] else reversed(base)):
 				consumer.game_result = state

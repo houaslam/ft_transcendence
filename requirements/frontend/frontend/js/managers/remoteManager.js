@@ -7,7 +7,7 @@ import appCanva from "./canvaManager.js"
 import * as THREE from 'https://cdnjs.cloudflare.com/ajax/libs/three.js/0.167.0/three.module.js'
 import { MODE, WORLD } from "../constants/engine.js"
 import { reset, tokenExpired } from '../utils/utils.js'
-import { tokenService } from "./globalManager.js"
+import { getclickedCancelBtn, setclickedCancelBtn, tokenService } from "./globalManager.js"
 import { modalService } from "../services/modalService.js"
 import { globalManager } from "./globalManager.js"
 import { getIsItOutOfGame, setIsItOutOfGame } from "./globalManager.js"
@@ -57,7 +57,8 @@ export default class Remote{
 
 	async _handle_cancel_btn( ){
 		document.getElementById( "cancel-btn" ).removeEventListener( 'click',  this._handle_cancel_btn)
-		setIsItOutOfGame(true)
+
+		setclickedCancelBtn(true)
 	}
 
 	_setupSocket(  ) {
@@ -93,14 +94,18 @@ export default class Remote{
 		this.canva.update( 'score', data, author )
 	}
 
+	handleMatchmaking( data ){
+		this.canva.update( "waiting", data)
+	}
+
 	updateStart( data ){
 		if (this.mode == MODE.REMOTE)
 			this.canva.setup(  data, MODE.REMOTE, data.author )
 		else
 			this.canva.setup( data, MODE.MULTIPLAYER, data.author )
 
-		this.canva.add( "score" )
 		this.canva.remove( "waiting" )
+		this.canva.add( "score" )
 	}
 
 	updateState( data, resolve ){
@@ -110,24 +115,28 @@ export default class Remote{
 	}
 
 	initialAnimation(){
+		this.engine.camera.position.x -= this.animationProgress * .05
+		this.engine.camera.position.y += this.animationProgress * .05
 		this.animationProgress += 0.005;
-		this.engine.camera.position.lerpVectors( this.cameraInitial,  this.cameraTarget,  this.animationProgress )
 		this.engine.camera.lookAt( this.engine.scene.position )
 	}
 
 	animate(  ) {
 		this.id = requestAnimationFrame( (  ) => this.animate(  ) )
 		this.engine.world.step( WORLD.TIMESTAMP) 
-		if (getIsItOutOfGame( ) == true && this.socket.OPEN ){
+		if ((getIsItOutOfGame( ) == true && this.socket.OPEN) || (getclickedCancelBtn( ) == true && this.socket.OPEN )){
 			this.socket.close(4000);
 			cancelAnimationFrame( this.id )
-			setIsItOutOfGame( false )
 			return this.resolve( )
 		}
-		if ( this.animationProgress < 1 )
+		else if (this.animationProgress >= 1  && this.animationProgress < 5  && getIsItOutOfGame() == false  ){
+			this.engine.setupControls()
+			this.animationProgress = 10
+		}
+		else if ( this.animationProgress < 1 )
 			this.initialAnimation(  )
 		else
-			this.update( this.id )
+			this.update( )
 		this.engine.renderer.render(  this.engine.scene, this.engine.camera  );
 	
 	}

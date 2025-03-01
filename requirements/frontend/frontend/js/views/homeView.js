@@ -23,10 +23,19 @@ export class homeView extends HTMLElement
         })
 
         this.addLeaderBoard()
+
+        const main = document.getElementById('main')
+        main.style.overflow = 'visible'
+    }
+    disconnectedCallback()
+    {
+        const main = document.getElementById('main')
+        if (main)
+            main.style.overflow = 'hidden' 
     }
     addLeaderBoard()
     {
-        const leaderboardDb = this._database.extractData('leaderboard')
+        let leaderboardDb = this._database.extractData('leaderboard')
         const tournament = document.querySelector('.custom-table')
 
         tournament.innerHTML = homeTemplate.leaderboard(leaderboardDb)

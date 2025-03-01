@@ -1,9 +1,12 @@
+import { ENDPOINTS } from "../constants/endpoints.js"
+
 export class TokenService
 {
     constructor()
     {
         this._accessToken = localStorage.getItem('accessToken')
         this._refreshToken = localStorage.getItem('refreshToken')
+
     }
     set tokens({refresh , access})
     {

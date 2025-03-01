@@ -7,7 +7,6 @@ export async function tournament( options, players ) {
         const winners = []
         const losers = []
 
-        console.log( players )
         for ( let i=0; i < players.length; i+= 2){
             await modalService.show(  `This round ${players[i]} vs ${players[i+1]}` , false)
             let winner = await local( options, [players[i], players[i+1]])
@@ -22,7 +21,6 @@ export async function tournament( options, players ) {
         await modalService.show(  `This round winner is ${third_place}` , false)
 
 
-
         await modalService.show(  `final round ${winners[0]} vs ${winners[1]}` , false)
         const first_place = await local( options, winners)
         if (!first_place) return false;
@@ -33,10 +31,10 @@ export async function tournament( options, players ) {
                 <div class="rank">
                    
                     <h2 class="secondPlace_title">
-                        <br> 🥈  ${first_place}
+                        <br> 🥈  ${second_place}
                     </h2>
                     <h2 class="firstPlace_title">
-                        🏆 ${second_place} 
+                        🏆 ${first_place} 
                     </h2>
                     <h2 class="thirdPlace_title">
                         <br> 🥉 ${third_place}

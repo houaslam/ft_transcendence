@@ -96,14 +96,14 @@ export const profileTemplate  =
             dynamicPart = 
             `  <div id="choices-container">
                 <div id="choices">
-                    <a class="selected-choice choice-item" href="#" id="friends">friends</a>
+                    <a class="selected-choice active choice-item" href="#" id="friends">friends</a>
                     <a href="#" id="requests" class="choice-item">requests</a>
                     <div id="sliding-line"></div>
                 </div>
             </div>`
         }
         else 
-            dynamicPart = `<h2>${username}'s friends</h2>`// in here gotta update the username
+            dynamicPart = `<h2>${username}'s friends</h2>`
 
         return `${dynamicPart}`
     }

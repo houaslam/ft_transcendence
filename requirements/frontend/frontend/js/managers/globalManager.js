@@ -12,6 +12,8 @@ const eventListeners = new EventService()
 const onlineStatusService = new OnlineStatusService()
 const tokenService = new TokenService()
 let isItOutOfGame = false
+let isAllOptionsForGameSettings = true
+let clickedCancelBtn = false
 
 export function setIsItOutOfGame(value)
 {
@@ -20,6 +22,24 @@ export function setIsItOutOfGame(value)
 export function getIsItOutOfGame()
 {
     return isItOutOfGame
+}
+
+export function setclickedCancelBtn(value)
+{
+    clickedCancelBtn = value
+}
+export function getclickedCancelBtn()
+{
+    return clickedCancelBtn
+}
+
+export function setisAllOptionsForGameSettings(value)
+{
+    isAllOptionsForGameSettings = value
+}
+export function getisAllOptionsForGameSettings()
+{
+    return isAllOptionsForGameSettings
 }
 
 export class GlobalManager
@@ -38,4 +58,4 @@ export class GlobalManager
 
 const globalManager = new GlobalManager()
 
-export { eventListeners, globalManager, tokenService, onlineStatusService}
+export { eventListeners, globalManager, tokenService, onlineStatusService }

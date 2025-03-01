@@ -60,7 +60,7 @@ export class ProfileView extends HTMLElement
     gameHistory()
     {
         const gameHistory = document.querySelector('.custom-table')
-        let gameHistoryDb = this._database.extractData('gameHistory')
+        const gameHistoryDb = this._database.extractData('gameHistory')
         
         gameHistory.innerHTML = profileTemplate.gameHistory(gameHistoryDb)
     }
@@ -73,6 +73,7 @@ export class ProfileView extends HTMLElement
 
         friends.friendsListDb = this._database.extractData('friendsList')
         friends.friendsRequestsDb = this._database.extractData('friendsRequests')
+        friends.type = this._userId === 'me' ? 'mine' : 'other'
         
         friendsBox.appendChild(friends)
     }

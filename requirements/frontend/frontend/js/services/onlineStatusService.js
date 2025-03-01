@@ -12,16 +12,12 @@ export class OnlineStatusService
 
     set newFriend(newValue)
     {
-        console.log('added a new friends!!')
         this._socket.send(JSON.stringify({type: 'new_friend', friend_id: newValue}))
     }
     set removeFriend(newValue)
     {
-        console.log('removed friends!!')
-
         this._socket.send(JSON.stringify({type: 'removed_friend', friend_id: newValue}))
         this.updateFriend()
-        
     }
     get onlineFriendsList()
     {
@@ -29,42 +25,47 @@ export class OnlineStatusService
     }
     init()
     {
+        return new Promise (resolve => {
+            this.createSocket(resolve)
+        })
+    }
+    createSocket(resolve)
+    {
         this._socket = new WebSocket(`wss://${window.location.host}/wss/online_status?token=${tokenService.accessToken}`)
         this._debounced = debounce(this.updateContent, 500)
 
-        this._socket.onopen = () => { 
-            console.log('websocket was opened successfully !!!')
-        }
-        
         this._socket.onclose = (e) => {
-            console.log('websocket was closed because ', e.reason , ' with code ', e.code)
             if (e.code === 1006)
-                tokenExpired(this.init.bind(this))
+                tokenExpired(this.createSocket.bind(this, resolve))
         }
         this._socket.onmessage = (e) => {
             const response = JSON.parse(e.data)
-            console.log('websocket got a message the response is  : ', response)
             const {type, online_friends, friend_id, status} = response
-
+         
             if (type === 'online_friends_list')
-                this._onlineFriendsList = Object.values(online_friends)
-            else if (type === 'friend_online_status')
-                this._debounced({friend_id, status})
-            else if (type === 'friend_removed')
             {
-                this.updateFriend(friend_id)
-                console.log('final list : ', this._onlineFriendsList)
+                this._onlineFriendsList = Object.values(online_friends)
+                resolve()
             }
+            else if (type === 'friend_online_status')
+                this._debounced({friend_id : Number(friend_id), status})
+            else if (type === 'friend_removed')
+                this.updateFriend(friend_id, true)
         }
     }
-    updateFriend(friend_id)
+    updateFriend(friend_id, onMessage = false)
     {
         this._onlineFriendsList = this._onlineFriendsList.filter((num) => num !== friend_id);
         
-        console.log('when removing ------ ', this._onlineFriendsList)
         const profileView = document.querySelector('profile-view')
         if (profileView)
-            profileView.updateStatus = {friend_id, status : 'unknown'}
+        {
+            profileView.updateStatus = {friend_id, status : ''}
+            
+            const friendsBoxContainer = document.getElementById('friends-box-container')
+            if (onMessage === true)
+                friendsBoxContainer.updateFriendsDb = friend_id
+        }
     }
     updateContent({friend_id, status})
     {        
@@ -76,9 +77,9 @@ export class OnlineStatusService
         const profileView = document.querySelector('profile-view')
         if (profileView)
         {
-            const friendsBoxContainer = document.getElementById('friends-box-container')
-
             profileView.updateStatus = {friend_id, status}
+
+            const friendsBoxContainer = document.getElementById('friends-box-container')
             friendsBoxContainer.updateStatus = {friend_id, status}
         }
     }

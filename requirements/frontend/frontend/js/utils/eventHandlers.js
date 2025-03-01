@@ -1,10 +1,10 @@
 import { modalService } from '../services/modalService.js'
 import { searchService } from '../services/searchService.js'
-import { GameManager } from "../managers/modesManager.js"
+import  GameManager  from "../managers/modesManager.js"
 import { ENDPOINTS } from "../constants/endpoints.js"
 import { onlineStatusService } from "../managers/globalManager.js"
 import { tokenService } from "../managers/globalManager.js"
-import { loader, write } from './utils.js'
+import { loader, write , debounce} from './utils.js'
 
 export const eventHandlersForProfile = 
 {
@@ -46,6 +46,7 @@ export const eventHandlersForProfile =
             slidingLine.style.width = `${target.offsetWidth}px`
             slidingLine.style.transform = `translateX(${target.offsetLeft}px)`
             target.classList.add('hoovered')
+            selectedChoice.classList.remove('active')
         },
         mouseOutSelectedChoice(target)
         {
@@ -55,6 +56,7 @@ export const eventHandlersForProfile =
             slidingLine.style.width = `${selectedChoice.offsetWidth}px`
             slidingLine.style.transform = `translateX(${selectedChoice.offsetLeft}px)`
             target.classList.remove('hoovered')
+            selectedChoice.classList.add('active')
         }
     },
     click : 
@@ -66,8 +68,8 @@ export const eventHandlersForProfile =
 
             slidingLine.style.width = `${target.offsetWidth}px`
             slidingLine.style.transform = `translateX(${target.offsetLeft}px)`
-            selectedChoice.classList.remove('selected-choice')
-            target.classList.add('selected-choice')
+            selectedChoice.classList.remove('selected-choice', 'active')
+            target.classList.add('selected-choice', 'active')
 
             const friendsBoxContainer = document.getElementById('friends-box-container')
             friendsBoxContainer.friendsList = target.id === 'friends' ? true : false
@@ -106,11 +108,32 @@ export const eventHandlersForEventManager = (eventManager) =>
                 runAction(realTarget)
             }
         },
+        async updateContentForIntra(event)
+        {
+            eventManager._router.handleRoute('/')
+            tokenService.tokens = event.data
+            await onlineStatusService.init()
+            await eventManager._reset()
+
+            const userInfos = await eventManager._apiService.user.getBasicDataOfUser() 
+            const text = `hello , ${userInfos.username}`
+            
+            write(text, 100)
+            
+            eventManager._router.handleRoute('/')
+        },
         async handleIntraCall(target)
         {
             const response = await eventManager._apiService.auth.intraAuthorize()
+            this._debounced = debounce(this.updateContentForIntra, 500)
 
-            window.location.href = response.intra_auth_url
+            window.open(response.intra_auth_url, 'continue with intra', 'width=800,height=600,left=100,top=100');
+            window.addEventListener('message', (event) => {
+
+                if (!event.data.error)
+                    this._debounced(event)
+            })
+
         },
         handleNavigation(target)
         {
@@ -133,29 +156,22 @@ export const eventHandlersForEventManager = (eventManager) =>
         {
             const action = target.getAttribute('action-type')
             const id = target.getAttribute('id')
-            const mainElement = target.closest(['[class="icons"]'])
     
             if (action === 'send_request' || action === 'accept_request')
             {
                 await eventManager._apiService.friendship.postFriendship(action, id)
-                if (action === 'send_request')
-                    mainElement.relationshipStatus = 'requested'
-                else
-                {
+                if (action === 'accept_request')
                     onlineStatusService.newFriend = id
-                    mainElement.relationshipStatus = 'friend'
-                }
             }
             else if (action === 'remove_friend' || action === 'cancel_request' || action === 'reject_request')
             {
                 await eventManager._apiService.friendship.deleteFriendship(action, id)
-                console.log('action == ', action)
                 if (action === 'remove_friend')
                     onlineStatusService.removeFriend = id
-                mainElement.relationshipStatus = 'stranger'
             }
             else 
                 eventManager._router.handleRoute('/settings')
+            this.modifyIconsValue(target, action)
         },
         async handleFriendsIcons(target)
         {
@@ -171,12 +187,26 @@ export const eventHandlersForEventManager = (eventManager) =>
 
             const friendsBoxItemId = target.closest('.friends-box-item').getAttribute('index')
             const friendsBoxContainer = document.getElementById('friends-box-container')
-            friendsBoxContainer.updateDb = {index : friendsBoxItemId, action}
-            
+
             if (action === 'accept_request')
                 onlineStatusService.newFriend = id
             else 
                 onlineStatusService.removeFriend = id
+            if (friendsBoxContainer.getAttribute('box-type') === 'mine')
+                friendsBoxContainer.updateDb = {index : friendsBoxItemId, action}
+            this.modifyIconsValue(target, action)
+        },
+        modifyIconsValue(target, action)
+        {
+            const mainElement = target.closest(['[class="icons"]'])
+
+            if (action === 'send_request')
+                mainElement.relationshipStatus = 'requested'
+            else if (action === 'accept_request')
+                mainElement.relationshipStatus = 'friend'
+            else if (action === 'remove_friend' || action === 'cancel_request' || action === 'reject_request')
+                mainElement.relationshipStatus = 'stranger'
+
         }
     },
     button :
@@ -213,7 +243,7 @@ export const eventHandlersForEventManager = (eventManager) =>
         async handleNewUsername(target)
         {
             const input = document.getElementById('username-to-save')
-            const inputValue = input.value	
+            const inputValue = input.value.toLowerCase()
 
             if (!inputValue || inputValue.includes(' '))
                 modalService.show('enter a valid username')
@@ -221,15 +251,13 @@ export const eventHandlersForEventManager = (eventManager) =>
                 modalService.show('you already have the same username  - -')
             else
                 await eventManager._apiService.settings.updateUsername({new_username : inputValue})
-        
             input.value = ''
             input.placeholder = inputValue
         },
         async handleGame(target)
         {
             const gameMode = target.getAttribute("data-game-mode")
-            const gameManager = new GameManager( )
-            await gameManager[gameMode]()
+            await GameManager[gameMode]()
         },
         handleImgUpdate(target)
         {
@@ -253,7 +281,6 @@ export const eventHandlersForEventManager = (eventManager) =>
         {
             const userId = target.getAttribute('userid')
 
-            console.log('userid is : ', userId)
             eventManager._router.handleRoute(`/profile/${userId}`)
         }
     },
@@ -299,14 +326,17 @@ export const eventHandlersForEventManager = (eventManager) =>
             if (action === 'signin' || action === 'signup')
             {
                 const formObject = {}
-                formData.forEach((value, key) => { formObject[key] = value})
+                formData.forEach((value, key) => { 
+                    if (key === 'username')
+                        value = value.toLowerCase()
+                    formObject[key] = value
+                })
                 const response = await eventManager._apiService.auth[action](formObject)
 
                 if (action  === 'signup')
                     setTimeout(() => eventManager._router.handleRoute('/signin'), 150)
                 else
                 {
-                    
                     tokenService.tokens = response
                     const userInfos = await eventManager._apiService.user.getBasicDataOfUser()
                     
@@ -315,12 +345,11 @@ export const eventHandlersForEventManager = (eventManager) =>
                     onlineStatusService.init()
                     
                     const text = `hello , ${userInfos.username}`
-                    const welcomeText = document.getElementById('welcome-text')
 
-                    write(text, 100, welcomeText)
+                    write(text, 100)
                 }
             }
-        }
+        },
     },
     input :
     {

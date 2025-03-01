@@ -1,7 +1,7 @@
 import { ENDPOINTS } from '../constants/endpoints.js'
 import { modalService } from './modalService.js' // this one too need to find a solution for it
 import { globalManager, tokenService } from '../managers/globalManager.js'
-import { tokenExpired } from '../utils/utils.js'
+import { tokenExpired , loader} from '../utils/utils.js'
 
 class RequestConfiguration
 {
@@ -65,8 +65,6 @@ class ApiService
     set requestConfig(newValue)
     {
         this._requestConfig =  newValue
-
-        // console.log('im setting the value of new config : ', this._requestConfig)
     }
     set resolve(newValue)
     {
@@ -74,7 +72,6 @@ class ApiService
     }
     async request()
     {
-        //  console.log('before : ', this._requestConfig)
         let {
             endpoint,
             method,
@@ -83,7 +80,6 @@ class ApiService
             params
         } = this._requestConfig
 
-        // console.log('here in apiService  : ', this._requestConfig)
         const url = params ? `${endpoint}?${params.key}=${encodeURIComponent(params.value)}` : endpoint
         try{
             const response = await fetch(url , {
@@ -94,7 +90,6 @@ class ApiService
                 },
                 body : body ? JSON.stringify(body) : null
             })
-            // console.log('test response  , ', response)
             if (needsAuth && response.status === 401)
                 tokenExpired(this.request.bind(this))
             if (response.status === 500)
@@ -109,25 +104,25 @@ class ApiService
             if (!response.ok)
                 this.handleMessaageErrors(responseBody)
             else 
-                return await this.finishingUp(responseBody)
+                return await this.finishingUp(responseBody, url)
         }
         catch(error)
         {
-            console.log('the error ', error)
+            console.error('the error ', error)
         }
     }
-    async finishingUp(response =  null)
+    async finishingUp(response =  null, url = '')
     {
         const {showModal , modalMessage} = this._requestConfig
 
         if (showModal)
             await modalService.show(modalMessage, true)
-
+        
         this._resolve(response)
     }
     async handleMessaageErrors(responseBody)
     {
-        const {showModal} = this._requestConfig
+        const {showModal, endpoint} = this._requestConfig
         const entries = Object.entries(responseBody)
         const [key, value] = entries[0]
 
@@ -137,9 +132,21 @@ class ApiService
                return await modalService.show(`${value}`)
             await modalService.show(`${key} : ${value}`)
         }
+        if (endpoint === ENDPOINTS.INTRA_CALLBACK)
+            this.handleCasesForIntra()
+    }   
+    async handleCasesForIntra()
+    {
+        await loader(1500)
+        if (window.opener)
+        {
+            window.opener.postMessage({ error : 'user was not able to continue with intra'}, '*');
+            window.close();  
+        }
     }
 }
 
+const api = new ApiService()
 
 const generateHttpRequests = (api) =>
 ({
@@ -209,9 +216,8 @@ const generateHttpRequests = (api) =>
         }
     }
 })
-const api = new ApiService()
-const generatedHttpRequests = generateHttpRequests(api)
 
+const generatedHttpRequests = generateHttpRequests(api)
 export const apiService = 
 {
     auth :
@@ -249,7 +255,6 @@ export const apiService =
         postFriendship : (action, id) => new Promise (resolve => 
         {
             const messageIdentifier = action.replace('_',' the ')
-            // console.log('here : ', messageIdentifier)
             generatedHttpRequests.createPostRequest(`${ENDPOINTS.FRIENDSHIP}${action}/${id}`, {needsAuth : true, modalMessage: `you did ${messageIdentifier} successfully`})(null, resolve)
         }),
         deleteFriendship : (action, id) => new Promise (resolve => 

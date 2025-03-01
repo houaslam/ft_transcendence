@@ -1,9 +1,8 @@
 import {getIsItOutOfGame, setIsItOutOfGame, onlineStatusService, tokenService } from "../managers/globalManager.js"
 import { databaseExtractorService } from "../services/databaseExtractorService.js"
-import { write , delay} from "../utils/utils.js"
+import {delay, unwrite} from "../utils/utils.js"
 import { ROUTES } from '../constants/routes.js'
-import { modalService } from "../services/modalService.js"
-import { loader } from "../utils/utils.js"
+import { eventListeners } from "../managers/globalManager.js"
 
 import '../views/homeView.js'
 import '../views/profileView.js'
@@ -26,82 +25,11 @@ export class Router
     {
         if (tokenService.isAuthenticated())
         {
-            onlineStatusService.init()
+            await onlineStatusService.init()
             await this.initBasicRoutes()
         }
         window.addEventListener('popstate', (event) => this.handleRoute(event.state ? event.state.path : null, false))
-        this.handleRoute()
-    }
-    async handleRoute(newPath=null, addToHistory = true)
-    {
-        const path = newPath || (window.location.pathname !== '/game-settings' ? window.location.pathname : '/')
-        const query = window.location.search
-
-        if (this._route === '/game' && path === '/profile')
-        {
-            console.log('im in here - -')
-            setIsItOutOfGame(true)
-            await this.initBasicRoutes()
-        }
-        if (document.getElementById('welcome-text') && document.getElementById('welcome-text').innerHTML.length)
-            this.removeWelcomeText()
-        if (query)
-            await this.handleIntraRoute(query)
-        if (!tokenService.isAuthenticated() && (path !== '/signup' || path !== '/signup'))
-            this.navigateTo('/signin', addToHistory)
-        else if (tokenService.isAuthenticated() && (path === '/signin' || path === '/signup'))
-            this.navigateTo('/', addToHistory)
-        else if (path === '/game')
-            this.navigateTo('/', addToHistory)
-        else
-            this.navigateTo(path, addToHistory)
-    }
-    navigateTo(path, addToHistory)
-    {
-        let options = null
-
-        if (addToHistory === true)
-            history.pushState({path}, '', path)
-        if (path.includes('/profile'))
-        {
-            if (path === '/profile' || path.includes('/profile/'))
-            {
-                const str = path.split('/')
-                options = str[str.length - 1] === 'profile' ? 'me' : str[str.length - 1]
-                path = '/profile'
-            }
-            else 
-                path = '/404'
-        }
-        this._route = path
-        this.updateContent(path, options)
-    }
-    async removeWelcomeText()
-    {
-        const welcomeText = document.getElementById('welcome-text')
-
-        await delay(3000)
-        welcomeText.replaceChildren()
-    }
-    handleIntraRoute(query)
-    {
-        return new Promise (async resolve  => {
-            const params = new URLSearchParams(query)
-            const code = params.get('code')
-    
-            const response = await this._apiService.auth.intraCallback({code : code})
-            tokenService.tokens = response
-            await this._reset()
-            onlineStatusService.init()
-
-            const userInfos = await this._apiService.user.getBasicDataOfUser()
-
-            const text = `hello , ${userInfos.username}`
-            const welcomeText = document.getElementById('welcome-text')
-
-            write(text, 100, welcomeText)
-            resolve()
-        })
+        this.handleRoute(null)
     }
     initBasicRoutes()
     {
@@ -115,10 +43,88 @@ export class Router
             resolve()
         })
     }
-    async updateContent(path, options)
+    async handleRoute(newPath=null, addToHistory = true)
     {
+        const path = newPath || (window.location.pathname !== '/game-settings' ? window.location.pathname : '/')
+        const query = path === '/' ? window.location.search :  null
+
+        if (this._route === '/game' && path === '/game-settings')
+            await this.handlePopstateGame()
+        if (document.getElementById('welcome-text') && document.getElementById('welcome-text').innerHTML.length
+            && (path !== '/' && this._route !== '/signin' && this._route !== '/signup'))
+            this.removeWelcomeText()
+        if (query)
+            return this.handleIntraRoute(query)
+        if (!tokenService.isAuthenticated() && (path !== '/signin' && path !== '/signup'))
+            this.navigateTo('/signin', addToHistory, '/signin')
+        else if (tokenService.isAuthenticated() && (path === '/signin' || path === '/signup'))
+            this.navigateTo('/', addToHistory, '/')
+        else if (path === '/game' || (this._route === '/game' && path === '/game-settings') || (path === '/game-settings' && this._route === '/'))
+            this.navigateTo('/', addToHistory, '/')
+        else
+            this.navigateTo(path, addToHistory)
+    }
+    navigateTo(path, addToHistory, toReplaceHistory = null)
+    {
+        let options = null
+
+        if (addToHistory === true)
+            history.pushState({path}, '', path)
+        if (path.includes('/profile'))
+        {
+            options = this.parseProfile(path)
+            path = options !== null ? '/profile' : '/404'
+        }
+        if (this._route === '/signin' && path === '/')
+            toReplaceHistory = '/'
+        if (toReplaceHistory !== null)
+            history.replaceState({}, '', toReplaceHistory)
+        this._route = path
+        this.updateContent(path, options)
+    }
+    parseProfile(path)
+    {
+        const str = path.split('/')
+        if (str.includes("profile"))
+            return (str[str.length - 1] === 'profile' ? 'me' : str[str.length - 1])
+        return null
+    }
+    async removeWelcomeText()
+    {
+        const welcomeText = document.getElementById('welcome-text')
+
+        await delay(3000)
+        unwrite(100, welcomeText)
+    }
+    async handlePopstateGame()
+    {
+        return new Promise(async resolve => {
+            setIsItOutOfGame(true)
+            await this.initBasicRoutes()
+            setIsItOutOfGame(false)
+            resolve()
+        })
+    }
+    async handleIntraRoute(query)
+    {
+        const params = new URLSearchParams(query)
+        const code = params.get('code')
+
+        const response = await this._apiService.auth.intraCallback({code : code})
+        if (window.opener)
+        {
+            window.opener.postMessage({ refresh: response.refresh, access : response.access}, '*');
+            window.close();  
+        }
+    }
+    async updateContent(path, options)
+    {        
         let fragment = document.createDocumentFragment()
+        const app = document.getElementById('app')
+        const main = document.getElementById('main')
+        
         const route = this._routes[path] || this._routes['/404']
+        const container = route.allScreen ? app : main
 
         if (route.customElement)
         {
@@ -139,18 +145,27 @@ export class Router
             fragment.appendChild(template.content)
         }
 
-        const app = document.getElementById('app')
-        const main = document.getElementById('main')
-        const container = route.allScreen ? app : main
-
         container.replaceChildren(fragment)
+        this.doSomeChecks(app)
+    }
+    doSomeChecks(app)
+    {
+        const modalBackground = app.querySelector('#modal-background')
+
+        if (modalBackground)
+        {
+            modalBackground.remove()
+            eventListeners.off(modalBackground, 'click')
+        }
     }
     async fetchDataForCtmEl(options, api)
     {
-        const response = await api(options)
-
-        if (response === 'not found')
-            return this.handleRoute('/404')
-        return new databaseExtractorService(response, this)
+        return new Promise (async resolve  => {
+            const response = await api(options)
+        
+            if (response === 'not found')
+                return this.handleRoute('/404')
+            resolve(new databaseExtractorService(response, this))
+        })
     }
 }

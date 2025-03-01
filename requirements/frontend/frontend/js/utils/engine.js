@@ -34,9 +34,14 @@ export default class Engine {
 		this.onWindowResize( )
 	}
 
+	setupControls( ){
+		this.controls  = new OrbitControls( this.camera, this.renderer.domElement )
+		this.controls.minDistance = 2
+		this.controls.maxDistance = 20
+	}
+
 	setupCamera(  ){
         this.camera.position.set( ...Object.values( CAMERA.INITIALPOSITION ) )
-		new OrbitControls( this.camera, this.renderer.domElement )
 	}
 
 	setupLight(  ){

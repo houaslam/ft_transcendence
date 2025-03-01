@@ -1,5 +1,5 @@
 import { eventListeners } from '../managers/globalManager.js'
-
+import { modalService } from './modalService.js'
 export class FormService
 {
     constructor()
@@ -12,7 +12,7 @@ export class FormService
         modalBackground.remove()
         eventListeners.off(modalBackground, 'click')
     }
-    #eventHandlerTournamentForm(event, resolve)
+    #eventHandlerTournamentForm(event, resolve, reject)
     {
         const form = document.querySelector( 'form' )
         
@@ -23,7 +23,22 @@ export class FormService
         let playersObject = Object.fromEntries( data )
         let players = Object.values( playersObject )
         eventListeners.off(form, 'submit')
-        resolve( players )
+        
+        if (players.length !== new Set(players).size)
+            return modalService.show('Entries should be unique')
+        try
+        {
+            players.forEach((e, index) => {
+                if (e.length > 10)
+                    throw new Error("exit loop")
+            })
+            resolve(players)
+        }
+        catch(e)
+        {
+            modalService.show('Entries should be less than 10 characters')
+        }
+       
     }
     #eventHandlerGameForm( event, resolve )
     {
@@ -35,6 +50,7 @@ export class FormService
         let data = new FormData( form );
         let gameSettings = Object.fromEntries( data )
         eventListeners.off(form, 'submit')
+
         resolve( gameSettings )
     }
     #eventHandlerPasswordForm (event, resolve)
@@ -51,7 +67,7 @@ export class FormService
     }
     handleTournament()
     {
-        return new Promise (resolve => {
+        return new Promise ((resolve, reject) => {
             const form = document.querySelector('form')
             
             eventListeners.on(form, 'submit', (event) => this.#eventHandlerTournamentForm(event, resolve)) // remove this one
